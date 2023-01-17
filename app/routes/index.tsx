@@ -4,8 +4,20 @@ import { getMDXComponent } from "mdx-bundler/client";
 import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
 import { parseISO, format } from "date-fns";
+import * as GitHub from "~/utils/github.server";
+import { match, P } from "ts-pattern";
 
-export function loader() {
+export async function loader() {
+  const res = await GitHub.getFile({
+    owner: "kayac",
+    repo: "just-func.com",
+    path: "package.json",
+  });
+
+  const data = match(res)
+    .with({ status: 200, data: P.select() }, (data) => data)
+    .otherwise(() => null);
+
   const mdxSource = `
 ---
 title: Example Post

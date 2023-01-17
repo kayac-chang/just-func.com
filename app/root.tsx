@@ -29,8 +29,13 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-neutral-900 text-white">
+        {/* navbar */}
+
+        {/* main */}
         <Outlet />
+
+        {/* footer */}
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

@@ -6,10 +6,17 @@ import { json } from "@remix-run/node";
 import { parseISO, format } from "date-fns";
 import * as GitHub from "~/utils/github.server";
 import { match, P } from "ts-pattern";
+import type { MetaFunction } from "@remix-run/node";
 
 function toMDX(source: string) {
   return mdx({ source }).then(json);
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return {
+    title: data.frontmatter.title,
+  };
+};
 
 export async function loader() {
   const res = await GitHub.getFile({
@@ -23,15 +30,13 @@ export async function loader() {
     .run();
 }
 
-const layout = "pt-24 px-4";
-
 function Route() {
   const { code, frontmatter } = useLoaderData<typeof loader>();
   const Component = useMemo(() => getMDXComponent(code), [code]);
 
   return (
-    <main className={layout}>
-      <article className="prose prose-invert">
+    <main className="pt-24 px-4 container">
+      <article className="prose prose-invert lg:prose-xl mx-auto">
         <header>
           {/* title */}
           <h1>{frontmatter.title}</h1>

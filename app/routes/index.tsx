@@ -7,32 +7,20 @@ import { parseISO, format } from "date-fns";
 import * as GitHub from "~/utils/github.server";
 import { match, P } from "ts-pattern";
 
+function toMDX(source: string) {
+  return mdx({ source }).then(json);
+}
+
 export async function loader() {
   const res = await GitHub.getFile({
-    owner: "kayac",
+    owner: "kayac-chang",
     repo: "just-func.com",
-    path: "package.json",
+    path: "contents/blogs/journey.mdx",
   });
 
-  const data = match(res)
-    .with({ status: 200, data: P.select() }, (data) => data)
-    .otherwise(() => null);
-
-  const mdxSource = `
----
-title: Example Post
-published: 2021-02-13
-description: This is some description
----
-
-# Wahoo
-
-Here's a **neat** demo:
-`.trim();
-
-  return mdx({
-    source: mdxSource,
-  }).then(json);
+  return match(res)
+    .with({ status: 200, data: P.select(P.string) }, toMDX)
+    .run();
 }
 
 const layout = "pt-24 px-4";

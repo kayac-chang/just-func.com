@@ -1,9 +1,9 @@
+const { flatRoutes } = require("remix-flat-routes");
+
 /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
-  ignoredRouteFiles: ["**/.*"],
-  // appDirectory: "app",
-  // assetsBuildDirectory: "public/build",
-  // serverBuildPath: "build/index.js",
-  // publicPath: "/build/",
-  serverDependenciesToBundle: [/mdx-bundler/],
+  ignoredRouteFiles: ["**/.*", "**/*.css", "**/*.test.{js,jsx,ts,tsx}"],
+  cacheDirectory: "./node_modules/.cache/remix",
+  serverDependenciesToBundle: [/mdx-bundler/, /@sindresorhus/],
+  routes: (defineRoutes) => flatRoutes("routes", defineRoutes),
 };

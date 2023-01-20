@@ -3,10 +3,21 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    @apply bg-neutral-900 text-white;
+  }
   main {
-    @apply pt-24 px-4 container;
+    @apply p-4 container;
   }
   article {
     @apply prose prose-invert lg:prose-xl mx-auto;
+  }
+}
+
+@layer components {
+  [data-logo] {
+    @apply text-3xl font-monoton;
+    @apply bg-gradient-to-t from-orange-400 to-sky-400;
+    @apply bg-clip-text text-transparent;
   }
 }

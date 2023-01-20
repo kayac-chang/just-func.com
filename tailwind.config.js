@@ -6,6 +6,9 @@ module.exports = {
       container: {
         center: true,
       },
+      fontFamily: {
+        monoton: ["Monoton", "cursive"],
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],

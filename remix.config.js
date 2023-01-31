@@ -3,7 +3,4 @@ module.exports = {
   ignoredRouteFiles: ["**/.*", "**/*.css", "**/*.test.{js,jsx,ts,tsx}"],
   cacheDirectory: "./node_modules/.cache/remix",
   serverDependenciesToBundle: [/mdx-bundler/, /@sindresorhus/],
-  future: {
-    v2_routeConvention: true,
-  },
 };

@@ -1,4 +1,3 @@
-import { bundleMDX } from "mdx-bundler";
 import path from "path";
 
 if (process.platform === "win32") {
@@ -18,6 +17,4 @@ if (process.platform === "win32") {
   );
 }
 
-export function mdx(...props: Parameters<typeof bundleMDX>) {
-  return bundleMDX(...props);
-}
+export { bundleMDX as mdx } from "mdx-bundler";

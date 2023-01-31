@@ -13,41 +13,55 @@ import type { MetaFunction, LoaderArgs } from "@remix-run/node";
 
 export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
   assert.string(params.slug);
-
   if (!data) {
     return {
       title: "Missing Blog",
       description: `There is no blog with the slug of ${params.slug}. 😢`,
     };
   }
-
   return {
     title: `${data.title} | JUST FUNC`,
+    description: data.description,
   };
 };
+
+interface Meta {
+  title: string;
+  published: string;
+  description: string;
+  cover: {
+    src: string;
+    alt: string;
+  };
+}
 
 export async function loader({ params }: LoaderArgs) {
   assert.string(params.slug);
 
-  const res = await GitHub.getFile({
-    owner: "kayac-chang",
-    repo: "just-func.com",
-    path: `contents/blogs/${params.slug}.mdx`,
-  });
-
-  return match(res)
-    .with({ status: 404 }, () => Promise.reject(notFound(null)))
-    .with({ status: 200, data: P.select(P.string) }, (source) =>
-      mdx({ source })
-        .then(({ code, frontmatter }) => ({
-          title: frontmatter.title,
-          published: frontmatter.published,
-          code,
-          readingTime: readingTime(source).minutes,
-        }))
-        .then(json)
-    )
-    .run();
+  return (
+    GitHub.getFile({
+      owner: "kayac-chang",
+      repo: "just-func.com",
+      path: `contents/blogs/${params.slug}.mdx`,
+    })
+      //
+      .then((res) =>
+        match(res)
+          .with({ status: 404 }, () => Promise.reject(notFound(null)))
+          .with({ status: 200, data: P.select(P.string) }, (source) =>
+            mdx<Meta>({ source })
+              .then(({ code, frontmatter }) => ({
+                title: frontmatter.title,
+                published: frontmatter.published,
+                description: frontmatter.description,
+                code,
+                readingTime: readingTime(source).minutes,
+              }))
+              .then(json)
+          )
+          .run()
+      )
+  );
 }
 
 export default function Route() {
@@ -72,10 +86,10 @@ export default function Route() {
           </div>
 
           {/* cover */}
-          <div className="aspect-video overflow-clip rounded-md">
+          <div className="aspect-[3/4] md:aspect-[3/2]">
             <img
-              className="w-full h-full object-cover object-center"
-              src="https://picsum.photos/seed/picsum/400.webp"
+              className="h-full object-cover object-center rounded-md"
+              src="https://picsum.photos/seed/picsum/1200/630.webp"
               alt="placeholder"
             />
           </div>

@@ -54,8 +54,9 @@ export async function loader({ params }: LoaderArgs) {
                 title: frontmatter.title,
                 published: frontmatter.published,
                 description: frontmatter.description,
-                code,
+                cover: frontmatter.cover,
                 readingTime: readingTime(source).minutes,
+                code,
               }))
               .then(json)
           )
@@ -65,32 +66,31 @@ export async function loader({ params }: LoaderArgs) {
 }
 
 export default function Route() {
-  const { code, title, published, readingTime } =
-    useLoaderData<typeof loader>();
-  const Component = useMemo(() => getMDXComponent(code), [code]);
+  const data = useLoaderData<typeof loader>();
+  const Component = useMemo(() => getMDXComponent(data.code), [data.code]);
 
   return (
     <main>
       <article>
         <header>
           {/* title */}
-          <h1>{title}</h1>
+          <h1>{data.title}</h1>
 
           {/* meta */}
           <div>
             {/* published */}
-            <span>{format(parseISO(published), "MMMM d, yyyy")}</span>
+            <span>{format(parseISO(data.published), "MMMM d, yyyy")}</span>
             <span> — </span>
             {/* reading time */}
-            <span>{Math.round(readingTime)} mins read</span>
+            <span>{Math.round(data.readingTime)} mins read</span>
           </div>
 
           {/* cover */}
           <div className="aspect-[3/4] md:aspect-[3/2]">
             <img
               className="h-full object-cover object-center rounded-md"
-              src="https://picsum.photos/seed/picsum/1200/630.webp"
-              alt="placeholder"
+              src={data.cover.src}
+              alt={data.cover.alt}
             />
           </div>
         </header>

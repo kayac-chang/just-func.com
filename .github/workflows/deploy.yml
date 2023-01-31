@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'contents/**'
+
 permissions:
   actions: write
   contents: read

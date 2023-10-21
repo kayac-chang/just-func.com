@@ -20,4 +20,8 @@
     @apply bg-gradient-to-t from-orange-400 to-sky-400;
     @apply bg-clip-text text-transparent;
   }
+  [data-link] {
+    @apply py-2 text-lg text-xl font-monoton;
+    @apply hover:underline;
+  }
 }

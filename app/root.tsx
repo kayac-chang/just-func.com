@@ -1,4 +1,5 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import { cssBundleHref } from "@remix-run/css-bundle";
+import type { LinksFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,14 +8,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import styles from "~/styles/output.prod.css";
+import styles from "~/globals.css";
 import Header from "~/components/Header";
+import Footer from "~/components/Footer";
 
 export const links: LinksFunction = () => [
-  {
-    href: styles,
-    rel: "stylesheet",
-  },
+  { rel: "stylesheet", href: styles },
+  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+
   {
     rel: "preconnect",
     href: "https://fonts.googleapis.com",
@@ -30,21 +31,21 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "LET'S JUST FUNC",
-  viewport: "width=device-width,initial-scale=1",
-});
-
 export default function App() {
   return (
     <html lang="en">
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
       <body>
+        <Header />
+        <hr className="w-6 my-8 mx-auto" />
         <Outlet />
+        <hr className="w-6 my-8 mx-auto" />
+        <Footer />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

@@ -1,6 +1,25 @@
+import readingTimeMdx from "remark-reading-time/mdx.js";
+
 /** @type {import('@remix-run/dev').AppConfig} */
-module.exports = {
+export default {
+  tailwind: true,
+  postcss: true,
   ignoredRouteFiles: ["**/.*", "**/*.css", "**/*.test.{js,jsx,ts,tsx}"],
-  cacheDirectory: "./node_modules/.cache/remix",
-  serverDependenciesToBundle: [/mdx-bundler/, /@sindresorhus/],
+  serverDependenciesToBundle: ["mdx-bundler"],
+  browserNodeBuiltinsPolyfill: {
+    modules: { stream: true, util: true },
+  },
+
+  async mdx() {
+    const [rehypeHighlight, remarkToc, readingTime] = await Promise.all([
+      import("rehype-highlight").then((mod) => mod.default),
+      import("remark-toc").then((mod) => mod.default),
+      import("remark-reading-time").then((mod) => mod.default),
+    ]);
+
+    return {
+      remarkPlugins: [remarkToc, readingTime, readingTimeMdx],
+      rehypePlugins: [rehypeHighlight],
+    };
+  },
 };

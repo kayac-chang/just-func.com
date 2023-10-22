@@ -2,7 +2,7 @@ import path from "path";
 import { bundleMDX } from "mdx-bundler";
 import remarkToc from "remark-toc";
 import remarkReadingTime from "remark-reading-time";
-import remarkReadingTimeMdx from "remark-reading-time/mdx";
+// import remarkReadingTimeMdx from "remark-reading-time/mdx";
 import rehypeHighlight from "rehype-highlight";
 
 if (process.platform === "win32") {
@@ -33,7 +33,7 @@ export function mdx(props: Props) {
         ...(options.remarkPlugins ?? []),
         remarkToc,
         remarkReadingTime,
-        remarkReadingTimeMdx,
+        // remarkReadingTimeMdx,
       ];
       options.rehypePlugins = [
         ...(options.rehypePlugins ?? []),

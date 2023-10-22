@@ -5,7 +5,7 @@ export default {
   ignoredRouteFiles: ["**/.*", "**/*.css", "**/*.test.{js,jsx,ts,tsx}"],
   serverDependenciesToBundle: ["mdx-bundler"],
   browserNodeBuiltinsPolyfill: {
-    modules: { stream: true, util: true },
+    modules: { stream: true, util: true, process: true, path: true, url: true },
   },
 
   // async mdx() {

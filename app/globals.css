@@ -12,6 +12,19 @@
   article {
     @apply prose prose-invert lg:prose-xl mx-auto;
   }
+  article code {
+    @apply bg-zinc-700 text-orange-400 py-1 px-2 rounded;
+  }
+  article pre code {
+    @apply bg-transparent text-current;
+  }
+  article a {
+    @apply text-sky-300;
+    @apply inline-flex items-center;
+  }
+  article :is(h1, h2, h3, h4, h5, h6) {
+    @apply flex items-center gap-2;
+  }
 }
 
 @layer components {
@@ -21,7 +34,7 @@
     @apply bg-clip-text text-transparent;
   }
   [data-link] {
-    @apply py-2 text-lg text-xl font-monoton;
+    @apply py-2 text-xl font-monoton;
     @apply hover:underline;
   }
 }

@@ -9,13 +9,13 @@ meta:
 published: 2023-01-18
 ---
 
-# 了解 Base64
+# 了解 Base64 {#understand-base64}
 
 ![Photo by picsum](https://images.unsplash.com/photo-1578048421563-9aa187e12baf)
 
 在了解 `base64` 之前，我們先來了解一下編碼是什麼。
 
-## 編碼是什麼？
+## 編碼是什麼？ {#what-is-encoding}
 
 **編碼**是將一種將資料**轉換**成另一種資料的過程，而這個過程是可以被**反轉**的。
 
@@ -40,15 +40,15 @@ a b c d e f g h i j k l m n o p q r s t u v w x y z
 常見的編碼方式有 `base64`、`hex`、`binary`、`ascii` 等等，  
 它們都是將資料轉換成另一種資料的規則，且具備不同的用途。
 
-### 為什麼要編碼？
+### 為什麼要編碼？ {#why-encoding}
 
 舉個例子，我們的電腦是以二進位的方式儲存資料的，  
 也就是說，我們的電腦只能儲存 `0` 跟 `1`，  
 所以當我們要儲存一個字元時，我們必須將這個字元轉換成二進位的資料，  
 且轉換必須是可以被反轉的，這樣我們才能將這個二進位的資料轉換回字元。
 
-諸如此類因為儲存資料的方式不同，所以必須要轉換的情況，  
-就會需要編碼來幫助我們將資料轉換成另一種資料。
+**諸如此類因為儲存資料的方式不同，所以必須要轉換的情況，  
+就會需要編碼來幫助我們將資料轉換成另一種資料。**
 
 這邊我們也可以發現到資料轉換能夠成立的條件，  
 是必須要基於共同的規則，例如前面提到的字母對應表，  
@@ -57,7 +57,7 @@ a b c d e f g h i j k l m n o p q r s t u v w x y z
 所以如果有人說他的檔案編碼跑掉 (或是說 出現亂碼 之類的)，  
 那其實就是指他用了跟你當初撰寫時不同的編碼 (字母對應表) 來開啟檔案。
 
-### 編碼適用於任何資料
+### 編碼適用於任何資料 {#encoding-for-any-data}
 
 雖然上面舉了文字的例子，但是編碼這個概念適用在任何資料上，  
 例如. 圖片、影片、音樂、檔案等等。
@@ -69,7 +69,7 @@ a b c d e f g h i j k l m n o p q r s t u v w x y z
 [go-image-jpeg]: https://pkg.go.dev/image/jpeg
 [rust-video]: https://docs.rs/video-rs/latest/video_rs/
 
-## Base64 是什麼？
+## Base64 是什麼？ {#what-is-base64}
 
 `base64` 是一種將二進位資料編碼成 [ASCII][ascii] 字元的編碼方式，  
 它的名稱來自於它的編碼字元表。
@@ -88,21 +88,20 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=
 它被設計出來的原因，就是想透過文字的方式來呈現二進位資料，  
 畢竟並不是所有的地方都能夠直接儲存二進位資料，  
 例如. HTML、JSON，這些檔案格式並沒辦法直接儲存二進位資料，  
-所以才會需要透過 `Base64` 透過文字的方式來儲存二進位資料。
+所以才會需要透過 `base64` 透過文字的方式來儲存二進位資料。
 
-二進位資料就是 `0` 跟 `1` 而已。
-正常不會直接去看 `0` 跟 `1` 來理解資訊，[它一開始就不是要設計來給人看的][not-human-readable]。
+正常不會直接去看 `base64` 來理解資訊，[它一開始就不是要設計來給人看的][not-human-readable]。
 
-### Base64 的應用場景
+### Base64 的應用場景 {#base64-use-cases}
 
 `base64` 通常用來解決儲存或是傳輸時，  
-只能使用 ASCII 字元 (包含它的超集 UTF-8) 這類無法接受任意二進位資料的情況，  
+只能使用 [ASCII] 字元 (包含它的超集 [UTF-8]) 這類無法接受任意二進位資料的情況，  
 已確保資料在傳輸或儲存的過程中保持資訊的完整而不會被破壞。
 
 舉個例子，  
 HTML 是純文本的檔案類型，所以我們無法直接嵌入二進位資料，  
 但是透過 `base64` 我們可以將二進位資料轉換成文字，  
-搭配 [`data:`URL][data-url] 來直接嵌入二進位資料。
+搭配 [data:URL][data-url] 來直接嵌入二進位資料。
 
 [data-url]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs
 
@@ -110,14 +109,14 @@ HTML 是純文本的檔案類型，所以我們無法直接嵌入二進位資料
 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIA..." />
 ```
 
-### Base64 不是加密法
+### Base64 不是加密法 {#base64-is-not-encryption}
 
 這是一個很常見也常被誤解的問題，
 
 **加密**是為了保密而對資訊進行轉換的過程，所以它也屬於編碼的一種，  
 但是**編碼**不一定是為了保密而進行的，  
 例如. `base64` 並不是為了保密而進行的編碼，  
-它只是原封不動的將二進位資料轉換成 ASCII 字元，  
+它只是原封不動的將二進位資料轉換成 [ASCII] 字元，  
 所以你可能不會希望看到 `base64` 這種編碼方式被用在加密上。
 
 > 如果你是想設計一張只有你跟你的朋友們才能看懂的字母對應表，  
@@ -125,7 +124,7 @@ HTML 是純文本的檔案類型，所以我們無法直接嵌入二進位資料
 
 [caesar_cipher]: https://en.wikipedia.org/wiki/Caesar_cipher
 
-### Base64 的變體 base64url
+### Base64 的變體 base64url {#base64url}
 
 `base64` 有一個變體叫做 `base64url`，  
 它是為了讓 `base64` 可以用於 URL 或是 檔案名稱 而設計的。
@@ -142,7 +141,7 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=
 
 [base64url-table]: https://datatracker.ietf.org/doc/html/rfc4648#:~:text=Table%202%3A%20The%20%22URL%20and%20Filename%20safe%22%20Base%2064%20Alphabet
 
-### Base64 會增加資料的大小
+### Base64 會增加資料的大小 {#base64-increase-data-size}
 
 常見的誤解認為 `base64` 可以將資料壓縮，  
 但是事實上，`base64` 會增加資料的大小。
@@ -160,14 +159,23 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=
 > 無論任何資料形式，都是由二進位資料組成的，計算大小的單位都是位元 (bits)，  
 > 一個 bit 只能儲存 `0` 或 `1`。
 
-### Base64 可以去除不可視字元
+### Base64 可以去除不可視字元 {#base64-remove-non-printable-characters}
 
-這個說法其實有點籠統且倒果為因了，  
+這個說法其實倒果為因了，  
 應該說它在設計階段就刻意避開了非英文單字 (Non-Alphabet) 的字元。
 
-## JavaScript 中的 Base64
+這樣做可以在理論上避開的兩個資安相關的風險：
 
-### [btoa] 跟 [atob]
+1. [convert channel][convert-channel]
+2. [buffer overflow attacks][buffer-overflow-attracks]
+   但本文主要是在講 base64 的 encode/decode，在此就不多做說明。
+
+[convert-channel]: https://en.wikipedia.org/wiki/Covert_channel
+[buffer-overflow-attracks]: https://en.wikipedia.org/wiki/Buffer_overflow
+
+## JavaScript 中的 Base64 {#base64-in-javascript}
+
+### [btoa] 跟 [atob] {#btoa-and-atob}
 
 在 JavaScript 中，我們可以透過 [btoa] 跟 [atob] 來進行 `base64` 的 encode 跟 decode。
 
@@ -209,7 +217,7 @@ btoa("🦄");
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
 [invalidcharactererror]: https://developer.mozilla.org/en-US/docs/Web/API/btoa#invalidcharactererror
 
-### [Encoding API][encoding-api]
+### Encoding API {#encoding-api}
 
 [Encoding API][encoding-api] 被設計用於處理各種字元編碼轉換，包括 [UTF-8][utf-8] 範圍字元集，  
 以下介紹 [Encoding API][encoding-api] 中的 [TextEncoder][textencoder] 跟 [TextDecoder][textdecoder]。
@@ -285,7 +293,7 @@ console.log(decoded);
 在處理文字與二進位資料轉換的時候，  
 使用上述方法來進行 `base64` 的 encode 跟 decode 會比 [btoa] 跟 [atob] 更理想。
 
-## Node.js 的 [Buffer]
+## Node.js 的 [Buffer] {#nodejs-buffer}
 
 在 Node.js，暫時無法使用 [Encoding API][encoding-api]，  
 但是 [Encoding API][encoding-api] 是 [WHATWG][whatwg-encoding] 提出的標準規格，  
@@ -305,7 +313,9 @@ console.log(decoded);
 // 🦄
 ```
 
-## 轉換任意二進制資料
+### 轉換任意二進制資料 {#convert-any-binary-data}
+
+除了在 [Encoding](#encoding-api) 中提到的方法，
 
 [rfc-4648]: https://tools.ietf.org/html/rfc4648#section-4
 [not-human-readable]: https://datatracker.ietf.org/doc/html/rfc4648#:~:text=The%20Base%2064%20encoding%20is%20designed%20to%20represent%20arbitrary%20sequences%20of%0A%20%20%20octets%20in%20a%20form%20that%20allows%20the%20use%20of%20both%20upper%2D%20and%20lowercase%0A%20%20%20letters%20but%20that%20need%20not%20be%20human%20readable.

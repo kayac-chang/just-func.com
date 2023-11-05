@@ -13,9 +13,6 @@ function Header() {
 
         {/* nav */}
         <nav className="grid sm:flex gap-2 sm:gap-8 md:ml-auto">
-          <Link to="/blogs">
-            <div data-link>BLOG</div>
-          </Link>
           <Link to="/about">
             <div data-link>ABOUT</div>
           </Link>

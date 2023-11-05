@@ -4,9 +4,9 @@ meta:
   - name: description
     content: 了解 Base64 到底是什麼，它的原理，以及它在 JavaScript 中如何應用
   - name: keywords
-    content: base64, javascript, encode, decode
+    content: base64, javascript, encode, decode, computer science
 
-published: 2023-01-18
+published: 2023-10-20
 ---
 
 # 了解 Base64 {#understand-base64}
@@ -159,7 +159,7 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=
 > 無論任何資料形式，都是由二進位資料組成的，計算大小的單位都是位元 (bits)，  
 > 一個 bit 只能儲存 `0` 或 `1`。
 
-### Base64 可以去除不可視字元 {#base64-remove-non-printable-characters}
+### Base64 去除不可視字元 {#base64-remove-non-printable-characters}
 
 這個說法其實倒果為因了，  
 應該說它在設計階段就刻意避開了非英文單字 (Non-Alphabet) 的字元。
@@ -168,7 +168,8 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=
 
 1. [convert channel][convert-channel]
 2. [buffer overflow attacks][buffer-overflow-attracks]
-   但本文主要是在講 base64 的 encode/decode，在此就不多做說明。
+
+但本文主要是在講 `base64` 的 encode/decode，在此就不多做說明。
 
 [convert-channel]: https://en.wikipedia.org/wiki/Covert_channel
 [buffer-overflow-attracks]: https://en.wikipedia.org/wiki/Buffer_overflow
@@ -179,28 +180,23 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=
 
 在 JavaScript 中，我們可以透過 [btoa] 跟 [atob] 來進行 `base64` 的 encode 跟 decode。
 
-[btoa] 就是 `binary to ascii` 的縮寫，  
-用來將二進位文字資料轉換成 `base64` 的文字資料。
+[btoa] 就是 `binary to ascii` 的縮寫，用來將字串轉換成 `base64`。
 
-[atob] 就是 `ascii to binary` 的縮寫，  
-就是用來將 `base64` 的文字資料轉換回二進位文字資料。
+```js
+btoa("hello");
+// 'aGVsbG8='
+```
 
-> 這邊的二進位文字資料其實就是我們在程式裡面常用的 [string]。
+[atob] 就是 `ascii to binary` 的縮寫，就是用來將 `base64` 轉換回字串。
 
-但這兩個函式其實並沒有辦法完全將任意的二進位資料轉換成 `base64`，  
+```js
+atob("aGVsbG8=");
+// 'hello'
+```
+
+但這兩個函式其實並沒有辦法完全將任意的字串轉換成 `base64`，  
 他們能處理的只有 `0x00` 到 `0xFF` 這個範圍而已，  
-當出現超過這個範圍的二進位資料就會拋出 [InvalidCharacterError][invalidcharactererror]。
-
-> 這兩個函式並沒有支援轉換任意二進位資料的原因是  
-> 因為他們誕生的比 web 平台支援二進制資料型別的時間還早，  
-> 早期並沒有人覺得 web 平台需要支援二進制資料型別。
-
-> 因為當初的設計，只能夠處理 0x00 到 0xFF 這個範圍的二進位資料，  
-> 所以有些人以為 `base64` 是一種文字編碼，  
-> 但是 `base64` 是針對二進位資料的編碼，而不是針對文字編碼，  
-> [ASCII][ascii]，[UTF-8][utf-8] 這些才是針對文字的編碼。
-
-舉個例子，
+所以像是拋入 🦄 這類超過範圍的字元就會拋出 [InvalidCharacterError][invalidcharactererror]。
 
 ```js
 btoa("🦄");
@@ -208,9 +204,12 @@ btoa("🦄");
 // The string to be encoded contains characters outside of the Latin1 range.
 ```
 
-這邊的 `🦄` 就是超過了 `0xFF` 的範圍，  
+這兩個函式並沒有支援轉換任意二進位資料的原因是  
+因為他們誕生的比 web 平台支援二進制資料型別的時間還早，  
+早期並沒有人覺得 web 平台需要支援二進制資料型別。
+
 在現今大部分平台都支援 [UTF-8][utf-8] 這個範圍字元集的情況下，  
-使用 [btoa] 跟 [atob] 來進行 `base64` 的 encode 跟 decode 其實並不是很理想。
+直接使用 [btoa] 跟 [atob] 來進行 `base64` 的 encode 跟 decode 其實並不是很理想。
 
 [btoa]: https://developer.mozilla.org/en-US/docs/Web/API/btoa
 [atob]: https://developer.mozilla.org/en-US/docs/Web/API/atob
@@ -222,7 +221,7 @@ btoa("🦄");
 [Encoding API][encoding-api] 被設計用於處理各種字元編碼轉換，包括 [UTF-8][utf-8] 範圍字元集，  
 以下介紹 [Encoding API][encoding-api] 中的 [TextEncoder][textencoder] 跟 [TextDecoder][textdecoder]。
 
-[TextEncoder][textencoder] 主要用於將文字資料轉換成二進位資料，
+[TextEncoder][textencoder] 主要用於將字串轉換成二進位資料，
 
 ```js
 const encoder = new TextEncoder();
@@ -234,7 +233,7 @@ console.log(encoded);
 > [Uint8Array] 是一種固定長度的陣列，每格由 8 個位元組成的，  
 > 是 JavaScript 處理二進位資料的一種資料型別。
 
-[TextDecoder][textdecoder] 則用於將二進位資料轉換成文字資料，
+[TextDecoder][textdecoder] 則用於將二進位資料轉換成字串，
 
 ```js
 const decoder = new TextDecoder();
@@ -243,10 +242,10 @@ console.log(decoded);
 // 🦄
 ```
 
-上面雖然可以將 [UTF-8][utf-8] 範圍字元集的文字資料轉換成二進位資料，但是還不是 `base64`。  
-我們需要搭配 [btoa], [atob] 跟 [String.fromCodePoint][fromcodepoint] 來進行 `base64` 的 encode 跟 decode。
+上面雖然可以將 [UTF-8][utf-8] 範圍字元集的字串轉換成二進位資料，但是還不是 `base64`。  
+但搭配 [btoa], [atob] 跟 [String.fromCodePoint][fromcodepoint] 就可以進行 `base64` 的 encode 跟 decode 了。
 
-用 🦄 舉個例子，我們要將其轉換成 base64，整個轉換邏輯演算如下：
+用 🦄 舉個例子，我們要將其轉換成 `base64`，整個轉換邏輯演算如下：
 
 1. 將 [UTF-8][utf-8] 字元轉換成二進位，讓 🦄 展現原貌變成 `Uint8Array(4)`。  
    ( 🦄 => `Uint8Array(4)[240, 159, 166, 132]` )  
@@ -271,9 +270,9 @@ console.log(base64);
 // 8J+mhA==
 ```
 
-反之，要將 base64 轉換回 🦄，整個轉換邏輯演算如下：
+反之，要將 `base64` 轉換回 🦄，整個轉換邏輯演算如下：
 
-1. 透過 [atob] 將 base64 轉換成個別文字。  
+1. 透過 [atob] 將 `base64` 轉換成個別文字。  
    ( `atob('8J+mhA==')` => "ð\x9F¦\x84" )
 2. 將個別文字資料轉換成 `Uint8Array(4)`。  
    ( "ð\x9F¦\x84" => `Uint8Array(4)[240, 159, 166, 132]` )
@@ -292,6 +291,41 @@ console.log(decoded);
 在現今大部分系統都支援 [UTF-8][utf-8] 範圍字元集的情況下，  
 在處理文字與二進位資料轉換的時候，  
 使用上述方法來進行 `base64` 的 encode 跟 decode 會比 [btoa] 跟 [atob] 更理想。
+
+### 轉換任意二進制資料 {#convert-any-binary-data}
+
+在 [Encoding](#encoding-api) 中提到的方法其實就可以用在任意二進位資料的轉換上，
+
+```js
+const byteArray = new Uint8Array([240, 159, 166, 132]);
+const binString = String.fromCodePoint(...byteArray);
+const base64 = btoa(binString);
+```
+
+除此之外，我們也可以透過 [FileReader.readAsDataURL()][read-as-data-url] 來將檔案轉換成 `base64`，
+[readAsDataURL][read-as-data-url] 會回傳 [data:URL][data-url] 而它的內容就是 `base64`。
+
+```js
+function bytesToBase64DataUrl(bytes, type) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(new File([bytes], "", { type }));
+  });
+}
+
+const bytes = new Uint8Array([240, 159, 166, 132]);
+const dataUrl = await bytesToBase64DataUrl(bytes, "text/plain");
+// 'data:text/plain;base64,8J+mhA=='
+
+// regexp match dataurl base64 content
+const dataUrlRegex = /^data:(.+\/.+);base64,(.*)$/;
+const extractBase64 = (url) => dataUrlRegex.exec(url)?.[2] ?? "";
+
+const base64 = extractBase64(dataUrl);
+// '8J+mhA=='
+```
 
 ## Node.js 的 [Buffer] {#nodejs-buffer}
 
@@ -313,10 +347,6 @@ console.log(decoded);
 // 🦄
 ```
 
-### 轉換任意二進制資料 {#convert-any-binary-data}
-
-除了在 [Encoding](#encoding-api) 中提到的方法，
-
 [rfc-4648]: https://tools.ietf.org/html/rfc4648#section-4
 [not-human-readable]: https://datatracker.ietf.org/doc/html/rfc4648#:~:text=The%20Base%2064%20encoding%20is%20designed%20to%20represent%20arbitrary%20sequences%20of%0A%20%20%20octets%20in%20a%20form%20that%20allows%20the%20use%20of%20both%20upper%2D%20and%20lowercase%0A%20%20%20letters%20but%20that%20need%20not%20be%20human%20readable.
 [Buffer]: https://nodejs.org/api/buffer.html
@@ -328,3 +358,5 @@ console.log(decoded);
 [utf-8]: https://zh.wikipedia.org/wiki/UTF-8
 [ascii]: https://zh.wikipedia.org/wiki/ASCII
 [fromcodepoint]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCodePoint
+[read-as-data-url]: https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
+[data-url]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs

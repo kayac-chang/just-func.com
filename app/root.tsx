@@ -42,9 +42,7 @@ export default function App() {
       </head>
       <body>
         <Header />
-        <hr className="w-6 my-8 mx-auto" />
         <Outlet />
-        <hr className="w-6 my-8 mx-auto" />
         <Footer />
         <ScrollRestoration />
         <Scripts />

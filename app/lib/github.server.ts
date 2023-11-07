@@ -16,16 +16,16 @@ const app = new App({
   privateKey: process.env.GITHUB_PRIVATE_KEY,
   webhooks: { secret: process.env.GITHUB_WEBHOOK_SECRET },
 });
-async function getOctokit() {
+export async function getOctokit() {
   return app.getInstallationOctokit(Number(process.env.GITHUB_INSTALLATION_ID));
 }
 
-interface GetFileRequest {
+interface GetContentRequest {
   owner: string;
   repo: string;
   path: string;
 }
-export async function getFile(req: GetFileRequest) {
+export async function getContent(req: GetContentRequest) {
   return new Promise((resolve) =>
     getOctokit()
       .then((octokit) =>

@@ -1,29 +1,22 @@
 import { match, P } from "ts-pattern";
-import * as Github from "~/lib/github.server";
 import path from "path";
-import { readFileUtf8 } from "./fs.server";
+import { readFileUtf8 } from "~/lib/fs.server";
+import githubGetContent from "~/services/github-get-contnet.server";
+import { assert } from "@sindresorhus/is";
 
-export default (slug: string) =>
+const getBlogBySlugGithub = (slug: string) =>
+  githubGetContent(`/blogs/${slug}.mdx`).then((res) => {
+    assert.string(res);
+    return res;
+  });
+
+const getBlogBySlugLocal = (slug: string) =>
+  readFileUtf8(path.resolve(process.cwd(), `./blogs/${slug}.mdx`));
+
+const getBlogBySlug = (slug: string) =>
   match(process.env.NODE_ENV)
-    .with(P.union("development", "test"), () =>
-      readFileUtf8(path.resolve(process.cwd(), `./blogs/${slug}.mdx`))
-    )
-    .with("production", () =>
-      Github.getFile({
-        owner: "kayac-chang",
-        repo: "just-func.com",
-        path: `/blogs/${slug}.mdx`,
-      })
-        //
-        .then((res) =>
-          match(res)
-            .with({ status: 404 }, () =>
-              Promise.reject(new Response(null, { status: 404 }))
-            )
-            .with({ status: 200, data: P.select(P.string) }, String)
-            .otherwise(() =>
-              Promise.reject(new Response(null, { status: 500 }))
-            )
-        )
-    )
+    .with(P.union("development", "test"), () => getBlogBySlugLocal(slug))
+    .with("production", () => getBlogBySlugGithub(slug))
     .exhaustive();
+
+export default getBlogBySlug;

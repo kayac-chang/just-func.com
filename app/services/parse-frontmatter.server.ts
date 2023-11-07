@@ -19,7 +19,7 @@ interface RawFrontmatter {
   published: string;
 }
 
-export const parseFrontmatter = (content: string) =>
+const parseFrontmatter = (content: string) =>
   unified()
     .use(remarkParse)
     .use(remarkStringify)
@@ -27,4 +27,5 @@ export const parseFrontmatter = (content: string) =>
     .use(remarkParseFrontmatter)
     .process(content)
     .then((file) => file.data.frontmatter as RawFrontmatter);
+
 export default parseFrontmatter;

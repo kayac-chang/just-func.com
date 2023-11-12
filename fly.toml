@@ -1,41 +1,43 @@
-app = "just-func"
+# fly.toml app configuration file generated for just-func on 2023-11-12T21:00:53+08:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
+app = "just-func"
+primary_region = "sin"
 kill_signal = "SIGINT"
-kill_timeout = 5
-processes = []
+kill_timeout = "5s"
+
+[build]
 
 [[services]]
-  internal_port = 8080
-  processes = ["app"]
   protocol = "tcp"
-  script_checks = []
-
-  [services.concurrency]
-    hard_limit = 25
-    soft_limit = 20
-    type = "connections"
+  internal_port = 3000
+  processes = ["app"]
 
   [[services.ports]]
-    handlers = ["http"]
     port = 80
+    handlers = ["http"]
     force_https = true
 
   [[services.ports]]
-    handlers = ["tls", "http"]
     port = 443
+    handlers = ["tls", "http"]
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
 
   [[services.tcp_checks]]
-    grace_period = "1s"
     interval = "15s"
-    restart_limit = 0
     timeout = "2s"
+    grace_period = "1s"
 
   [[services.http_checks]]
     interval = "10s"
+    timeout = "2s"
     grace_period = "5s"
     method = "get"
     path = "/healthcheck"
     protocol = "http"
-    timeout = "2s"
     tls_skip_verify = false
-    [services.http_checks.headers]

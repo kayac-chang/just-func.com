@@ -11,6 +11,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@giscus/react": "^2.3.0",
     "@mdx-js/mdx": "^2.3.0",
     "@radix-ui/react-slot": "^1.0.2",
     "@react-hookz/web": "^23.1.0",

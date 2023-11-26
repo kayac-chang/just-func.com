@@ -1,11 +1,20 @@
-# 關於 HTTP Caching
+---
+meta:
+  - title: 關於 HTTP Caching
+  - name: description
+    content: 了解 Binary Search 是什麼，它的原理，以及它在 JavaScript 中如何應用
+  - name: keywords
+    content: binary search, javascript, algorithm
+
+published: 2023-10-23
+---
 
 這篇文章記錄下我看完 [HTTP Caching][rfc9111] httpwg 規格後的一些重點整理跟心得。
 
 ## 什麼是 HTTP Cache？
 
 HTTP Cache 是一種在本地端用來儲存 HTTP response 的子系統，
-在未來做相同 request 時可以減少回應時間以及網路頻寬消耗。  
+在未來做相同 request 時可以減少回應時間以及網路頻寬消耗。
 無論是 Client 或 Server 都可能用到 HTTP Cache。
 
 ### HTTP Cache 的種類

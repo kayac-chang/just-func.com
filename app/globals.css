@@ -9,7 +9,8 @@
   main {
     @apply p-4 container;
   }
-  article {
+  article,
+  .article {
     @apply prose prose-invert lg:prose-xl mx-auto;
   }
   article code {

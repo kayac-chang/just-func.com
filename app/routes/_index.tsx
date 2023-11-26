@@ -1,9 +1,16 @@
+import type { MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { parse } from "date-fns";
 import { map } from "ramda";
 import getBlogList from "~/services/get-blog-list.server";
 import parseFrontmatter from "~/services/parse-frontmatter.server";
+
+export const meta: MetaFunction<typeof loader> = () => [
+  {
+    title: "JUST FUNC",
+  },
+];
 
 interface Frontmatter {
   slug: string;
@@ -39,6 +46,9 @@ export function loader() {
       )
     )
     .then((promises) => Promise.all(promises))
+    .then((frontmatters) =>
+      frontmatters.sort((a, b) => b.published.getTime() - a.published.getTime())
+    )
     .then(json);
 }
 
@@ -46,13 +56,15 @@ export default function Component() {
   const data = useLoaderData<typeof loader>();
   return (
     <main>
-      <ul>
-        {data.map((blog) => (
-          <li key={blog.slug}>
-            <a href={`/blogs/${blog.slug}`}>{blog.title}</a>
-          </li>
-        ))}
-      </ul>
+      <div className="article prose-ul:list-none">
+        <ul>
+          {data.map((blog) => (
+            <li key={blog.slug}>
+              <a href={`/blogs/${blog.slug}`}>{blog.title}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </main>
   );
 }

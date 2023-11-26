@@ -10,13 +10,6 @@ function Header() {
             ||-Just-Func-||
           </div>
         </Link>
-
-        {/* nav */}
-        <nav className="grid sm:flex gap-2 sm:gap-8 md:ml-auto">
-          <Link to="/about">
-            <div data-link>ABOUT</div>
-          </Link>
-        </nav>
       </div>
     </header>
   );

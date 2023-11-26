@@ -1,5 +1,5 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -11,6 +11,21 @@ import {
 import styles from "~/globals.css";
 import Header from "~/components/Header";
 import Footer from "~/components/Footer";
+
+export const meta: MetaFunction = () => [
+  {
+    name: "description",
+    content: "Just 隨手寫寫技術部落格",
+  },
+  {
+    name: "og:type",
+    content: "website",
+  },
+  {
+    name: "og:site_name",
+    content: "JUST FUNC",
+  },
+];
 
 export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico" },

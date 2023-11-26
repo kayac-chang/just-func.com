@@ -24,7 +24,7 @@ const getBlogListGithub = () =>
     .then((files) => Promise.all(files));
 
 const getBlogListLocal = () =>
-  glob("blogs/**/*.mdx")
+  glob("blogs/*")
     .then(
       map((pathname) =>
         readFileUtf8(pathname).then((content) => ({ pathname, content }))

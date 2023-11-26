@@ -141,6 +141,30 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=
 
 [base64url-table]: https://datatracker.ietf.org/doc/html/rfc4648#:~:text=Table%202%3A%20The%20%22URL%20and%20Filename%20safe%22%20Base%2064%20Alphabet
 
+#### 如何在 base64 跟 base64url 之間轉換
+
+這裡提供 JavaScript 的實作方式。
+
+```js
+const base64Tobase64url = (text) =>
+  text
+   .replace(/\//g, "_")
+   .replace(/\+/g, "-")
+   .replace(/=/g, "");
+
+base64Tobase64url("8J+mhA=="); // 8J-mhA
+```
+
+```js
+const base64urlTobase64 = (text) =>
+  text
+   .replace(/_/g, "/")
+   .replace(/-/g, "+")
+   .padEnd(text.length + (text.length % 4), "=");
+
+base64urlTobase64("8J-mhA"); // 8J+mhA==
+```
+
 ### Base64 會增加資料的大小 {#base64-increase-data-size}
 
 常見的誤解認為 `base64` 可以將資料壓縮，  

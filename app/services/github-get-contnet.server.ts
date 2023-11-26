@@ -1,4 +1,4 @@
-import { identity } from "ramda";
+import { identity, memoizeWith } from "ramda";
 import { match, P } from "ts-pattern";
 import * as Github from "~/lib/github.server";
 
@@ -27,4 +27,5 @@ const githubGetContent = (path: string) =>
       .with({ status: 200, data: P.select(P.string) }, String)
       .otherwise(() => Promise.reject(new Response(null, { status: 500 })))
   );
-export default githubGetContent;
+
+export default memoizeWith(identity, githubGetContent);

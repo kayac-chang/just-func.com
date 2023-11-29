@@ -9,7 +9,7 @@ meta:
 published: 2023-11-17
 ---
 
-# 靜態資源快取管理 Static Assets Caching
+# 靜態資源快取管理 Static Assets Caching {#static-asset-caching}
 
 ![Photo by picsum](https://images.unsplash.com/photo-1560719887-fe3105fa1e55)
 
@@ -19,7 +19,7 @@ published: 2023-11-17
 我們要如何處理靜態資源的快取 (Static Assets Caching)，  
 以及我們是如何解決快取導致的相關問題。
 
-## 什麼是快取？
+## 什麼是快取？ {#what-is-caching}
 
 快取 (Caching) 是指將資料儲存在記憶體中，以便未來能夠更快的存取資料。  
 我們可以簡單將快取視做一種 key-value 的資料結構，  
@@ -29,7 +29,7 @@ published: 2023-11-17
 
 > a.k.a 快取主要注意兩個點，KEY 跟 時間。
 
-## 什麼是靜態資源快取 (Static Assets Caching)？
+## 什麼是靜態資源快取 (Static Assets Caching)？{#what-is-static-assets-caching}
 
 這篇談到的 靜態資源快取 (Static Assets Caching)，是指將靜態資源檔案儲存在用戶的機器上。  
 這樣當用戶再次使用我們的應用程式，或是導覽到不同頁面但使用相同檔案時，  
@@ -45,7 +45,7 @@ published: 2023-11-17
 雖然實務上有蠻多細節，但大致上瀏覽器會根據 GET request url 來儲存對應的 response，  
 並會在快取過期時，瀏覽器才會再次發出 request 來取得最新的 response。
 
-## 靜態資源快取產生的問題
+## 靜態資源快取產生的問題 {#issues}
 
 雖然靜態資源快取 (Static Assets Caching) 有很多好處，  
 但它同時也會給我們開發者帶來一些麻煩。
@@ -61,9 +61,9 @@ published: 2023-11-17
 
 這看似是一個矛盾的問題，但我們可以透過一些技巧來解決這個問題，
 
-## 思路
+## 思路 {#thinking-process}
 
-### index.html
+### index.html {#index}
 
 當用戶使用我們的應用程式時，瀏覽器第一個會拿 `index.html`，  
 假設我們的 `index.html` 長這樣：
@@ -95,7 +95,7 @@ published: 2023-11-17
 如果瀏覽器預設會快取的話，  
 我們只需要聚焦在如何讓用戶能夠拿到最新的資源就行了。
 
-### 根據檔案內容產生對應的檔名
+### 根據檔案內容產生對應的檔名 {#filename}
 
 要避免瀏覽器使用快取，最直接的方法就是讓瀏覽器認為這是一個新的檔案，  
 而要讓瀏覽器認為這是一個新的檔案，最簡單的方法就是改變檔案的 URI (a.k.a 取得檔案的路徑)。
@@ -126,7 +126,7 @@ published: 2023-11-17
 這時，因為 `script.js` 的 URI 沒有改變，所以瀏覽器會使用快取，
 而 `style.css` 的 URI 改變了，所以瀏覽器會重新發出 request 來取得最新的資源。
 
-### URI
+### URI {#uri}
 
 那具體來說我們要怎麼改變 URI 來達到我們的目的？
 主要可以分成兩種方式：
@@ -140,7 +140,7 @@ published: 2023-11-17
 
 但每次都需要手動改變檔案名稱或是 query string，不僅麻煩，也容易出錯。
 
-### Fingerprints
+### Fingerprints {#fingerprints}
 
 Fingerprints 是一種演算法，
 會根據 檔案內容 產生一組比較短的對應字串，所以可以透過這組字串來比對檔案內容是否有變更。
@@ -155,15 +155,15 @@ Fingerprints 是一種演算法，
 這樣就可以避免每次發佈新版本時，都需要手動改變檔名，
 如果檔案內容沒有變更，就會產生與前一次相同的檔名，這樣瀏覽器就可以使用快取。
 
-## Bundler
+## Bundler {#bundler}
 
 通常前端 bundler 都已經內建相應的功能，我們只需要設定一下就可以了。
 
-### Vite
+### Vite {#vite}
 
 在 Vite 中，我們什麼都不用做，因為 Vite 預設就會自動加上 Fingerprints。
 
-### Webpack
+### Webpack {#webpack}
 
 在 Webpack 中，我們可以透過 [output.filename][webpack-output-filename] 來設定 初始載入檔案 的檔名，
 而 [output.chunkFilename][webpack-output-chunk-filename] 則是用來設定 動態加載檔案(lazy-loading) 的檔名。
@@ -184,7 +184,7 @@ module.exports = {
 
 > 關於 Webpack `[hash]`, `[contenthash]` 的差異，就不在這篇文章中討論了。
 
-### Gulp
+### Gulp {#gulp}
 
 在 Gulp 中，我們可以透過 [gulp-rev][gulp-rev] 來產生 Fingerprints。
 
@@ -204,12 +204,12 @@ gulp.task("default", function () {
 });
 ```
 
-## 傳慘應對法
+## 傳慘應對法 {#legacy}
 
 如果你很不幸的，沒有辦法使用任何 bundler，
 這邊提供一些方案，讓你可以在不使用 bundler 的情況下，也能夠達到相同的效果。
 
-### 透過 git 來產生 Fingerprints
+### 透過 git 來產生 Fingerprints {#git}
 
 git 提供了一個指令 `git hash-object`，可以根據檔案內容產生 Fingerprints。
 
@@ -236,7 +236,7 @@ mv style.css style-660b740f.css
 cp style.css style-660b740f.css
 ```
 
-### 透過 sum 來產生 Fingerprints
+### 透過 sum 來產生 Fingerprints {#sum}
 
 這邊指的 sum 是指包含 `cksum`,`md5sum`,`shasum` 任意一種。
 

@@ -27,7 +27,7 @@ export default function Route() {
     <main>
       <article dangerouslySetInnerHTML={{ __html: data.body }}></article>
 
-      <div className="max-w-screen-lg mx-auto px-16 mt-32">
+      <div className="max-w-screen-lg mx-auto md:px-16 mt-16 md:mt-32">
         <Giscus
           id="comments"
           repo="kayac-chang/just-func.com"

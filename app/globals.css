@@ -39,3 +39,7 @@
     @apply hover:underline;
   }
 }
+
+.katex-html {
+  @apply hidden;
+}

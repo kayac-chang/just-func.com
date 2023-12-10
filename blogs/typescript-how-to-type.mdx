@@ -1,0 +1,438 @@
+---
+meta:
+  - title: TypeScript 如何給予型別
+  - name: description
+    content: 了解 TypeScript 如何給予型別，了解 satisfies 是什麼，各類型別語法之間的差異，以及實際應用場景
+  - name: keywords
+    content: typescript, satisfies, static type check
+  - name: og:image
+    content: https://images.unsplash.com/photo-1637094410849-96576479b731
+
+published: 2023-12-09
+---
+
+# {frontmatter.meta[0].title}
+
+![Photo by picsum](https://images.unsplash.com/photo-1637094410849-96576479b731)
+
+## 型別註解
+
+**型別註解 (Type Annotations)** 是 TypeScript 用來明確 (explicit) 標註型別的方法。
+
+大致上可以分作：
+- Variables Type Annotations
+- Parameter Type Annotations
+- Return Type Annotations
+
+```ts
+let myname: string = "Alice";
+
+function greet(name: string): string {
+  return "Hello, " + name.toUpperCase() + "!!";
+}
+```
+
+上面範例可以這樣理解，  
+`myname` 透過 Type Annotations 明確賦予 `string` 型別，  
+`greet` 函式的參數 `name` 必須是 `string` 型別，  
+`greet` 函式的回傳必須是 `string` 型別。
+
+## 型別推斷
+
+不同於 Java, C# ，TypeScript 的型別註解 (Type Annotations) 並非是強制性的，
+
+```ts
+let myname = "Alice";
+
+function greet(name: string) {
+  return "Hello, " + name.toUpperCase() + "!!";
+}
+```
+
+上面可以看到，我們可以省略以下兩種類型的 Type Annotations：
+- Variables Type Annotations
+- Return Type Annotations
+
+因為 TypeScript 本身的型別推斷 (Type Inference) 能力非常強，  
+讓 TypeScript Compiler 來輔助我們做靜態型別檢查 (Static Type Check)。
+
+較近代一點的語言型別系統多多少少都有型別推斷功能來協助開發者進行開發，  
+像是 Rust，Golang 等。
+
+### Type Inference
+
+如果我們定義的 variable 沒有透過 Type Annotations 明確定義它的型別，  
+TypeScript 就會透過 **型別推斷 (Type Inference)** 來推斷出型別。
+
+```ts
+let x = 3; // let x: number
+```
+
+前面的程式碼，因為我們並未明確標註 `x` 的型別，  
+這時 TypeScript 的型別推斷會根據程式碼前後文推導出 `x` 這時的型別。
+
+當然，原始型別 (Primitive Type) 的 Type Inference 很直觀，  
+只要我們足夠熟悉 JavaScript 的型別系統。
+
+接下來要來看複雜的，複合型別 (Complex Type)。
+
+```ts
+let x = [0, 1, null]; // let x: (number | null)[]
+```
+
+上述宣告的 `x` 裏面的 item 出現總共兩種型別 `number` 和 `null`，  
+也就是說 `x` 裡面的每一個 item 有可能是 `number` 也有可能是 `null`，  
+所以 Type Inference 判斷 `x` 是 `(number | null)[]`。
+
+<Exam>
+<Exam.Question>
+以此類推，請問下面的 `zoo` Type Inference 會判定成什麼型別？
+```ts
+let zoo = [new Rhino(), new Elephant(), new Snake()];
+```
+</Exam.Question>
+<Exam.Answer>
+```ts
+let zoo = [new Rhino(), new Elephant(), new Snake()];
+// let zoo: (Rhino | Elephant | Snake)[]
+```
+</Exam.Answer>
+</Exam>
+
+### Contextual Typing
+
+前面有提到 Type Inference 可以根據前後文做型別推斷 (Contextual Typing)，  
+前後文推斷可以根據 表達式 (expression) 來推斷 variable 的型別。
+
+```ts
+window.onmousedown = function (mouseEvent) {
+  // (parameter) mouseEvent: MouseEvent
+  console.log(mouseEvent.button);
+  console.log(mouseEvent.kangaroo);
+  // Property 'kangaroo' does not exist on type 'MouseEvent'.(2339)
+};
+```
+
+在上面的範例中，我們並沒有明確標註 `mouseEvent` 的型別，  
+TypeScript 會自動根據 `window.onmousedown` 的型別來推斷 `mouseEvent` 目前是 `MouseEvent` 型別。
+
+```ts
+interface GlobalEventHandlers {
+  onmousedown: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null;
+  // ...
+}
+```
+
+如果你宣告的函式並沒有任何前後文可以讓 TypeScript 推斷時，  
+未明確標註型別的函式 parameter 會被判斷成 `any`。
+
+```ts
+const handler = function (uiEvent) {
+  // (parameter) uiEvent: any
+  console.log(uiEvent.button); // <- OK
+};
+```
+
+我們也可以透過明確給予 Type Annotations 來賦予型別資訊 (Type Information)，  
+Type Annotations 的標註會覆蓋掉 Type Inference 的推斷。
+
+```ts
+window.onmousedown = function (mouseEvent: any) {
+  // (parameter) mouseEvent: any
+  console.log(mouseEvent.button);
+  console.log(mouseEvent.kangaroo); // pass
+};
+```
+
+另外，Type Annotations 賦予的型別必須要是 Type Inference 型別的 超集 (superset)。
+
+太過數學的話，直接看以下範例。
+
+```ts
+window.onmousedown = function (mouseEvent) {
+  // (parameter) mouseEvent: MouseEvent
+};
+
+window.onmousedown = function (mouseEvent: MouseEvent) {
+  // (parameter) mouseEvent: MouseEvent
+};
+
+window.onmousedown = function (mouseEvent: UIEvent) {
+  // (parameter) mouseEvent: UIEvent
+};
+
+window.onmousedown = function (mouseEvent: Event) {
+  // (parameter) mouseEvent: Event
+};
+
+window.onmousedown = function (mouseEvent: unknown) {
+  // (parameter) mouseEvent: unknown
+};
+
+window.onmousedown = function (mouseEvent: any) {
+  // (parameter) mouseEvent: any
+};
+```
+
+從上可以發現，`mouseEvent` 被 Contextual 推斷出來的型別是 `MouseEvent`，  
+而我們可以標註的型別，由窄至廣分別為：
+
+```math
+MouseEvent ⊆ UIEvent ⊆ Event ⊆ unknown ⊆ any
+最窄                                     最廣
+```
+
+當 Type Annotations 標註的型別並非 `MouseEvent` 的超集時，  
+TypeScript 會拋出錯誤提醒。
+
+```ts
+window.onmessage = function (mouseEvent: PointerEvent) {
+  // Type 'MessageEvent<any>' is missing the following properties from type 'PointerEvent': height, isPrimary, pointerId, pointerType, and 33 more.(2322)
+};
+
+window.onmessage = function (mouseEvent: string) {
+  // Type 'MessageEvent<any>' is not assignable to type 'string'.(2322)
+};
+```
+
+## `satisfies`
+
+在 TypeScript v5 之後，  
+可以使用 `satisfies` 來輔助我們檢查 Type Inference 推斷出來的型別是否滿足我們想要的型別。
+
+假設，我們宣告一個物件 `routes`，如下：
+
+```ts
+const routes = {
+  "/": {},
+  "/users": {},
+  "/admin/users": {},
+};
+```
+
+此時，Type Inference 推導出來的型別是：
+
+```ts
+const routes: {
+    "/": {};
+    "/users": {};
+    "/admin/users": {};
+}
+```
+
+雖然 Type Inference 已經幫我們限縮到最嚴格的型別了，  
+但如果我想要確定推斷出來的型別必須是某個型別的子集 (subset)，  
+我就可以透過 `satisfies` 來做型別相容檢查。
+
+```ts
+const routes = {
+  "/": {},
+  "/users": {},
+  "/admin/users": {},
+} satisfies { [key: string]: {} }
+
+// const routes: {
+//    "/": {};
+//    "/users": {};
+//    "/admin/users": {};
+// }
+```
+
+在上面的範例中，  
+我希望 `routes` 被 Type Inference 推斷出的型別必須滿足 `{ [key: string]: {} }`，  
+TypeScript 沒有拋出任何錯誤表示 `satisfies` 檢查通過，  
+因為只是檢查，所以 `routes` 被 Type Inference 推斷出來的型別不變。
+
+以下讓我們多加一道檢查，我們想要型別必須要有 `/dashboard: {}` 這個 properties。
+
+```ts
+const routes = {
+  "/": {},
+  "/users": {},
+  "/admin/users": {},
+} satisfies { [key: string]: {}, "/dashboard": {} }
+
+// Property '"/dashboard"' is missing in type '{ "/": {}; "/users": {}; "/admin/users": {}; }' but required in type '{ [key: string]: {}; "/dashboard": {}; }'.(1360)
+```
+
+TypeScript 就會拋出錯誤告訴我們，  
+`{ "/": {}; "/users": {}; "/admin/users": {}; }` 這個型別  
+並不滿足 `{ [key: string]: {}; "/dashboard": {}; }`。
+
+### Type Annotations v.s. `satisfies`
+
+Type Annotations 並非一直都很好用，  
+以下範例會使原本足夠嚴格的型別變得太寬松。
+
+```ts
+const routes: { [key: string]: {} } = {
+  "/": {},
+  "/users": {},
+  "/admin/users": {},
+}
+
+// const routes: {
+//    [key: string]: {};
+// }
+```
+
+是否讓型別變寬鬆，這取決於我們當下的情境。
+
+```ts
+const routes1 = {
+  "/": {},
+  "/users": {},
+  "/admin/users": {},
+} satisfies { [key: string]: {} }
+
+routes1['/dashboard'] = {}
+// Property '/dashboard' does not exist on type '{ "/": {}; "/users": {}; "/admin/users": {}; }'.(7053)
+
+const routes2: { [key: string]: {} } = {
+  "/": {},
+  "/users": {},
+  "/admin/users": {},
+}
+
+routes2['/dashboard'] = {}
+```
+
+上面的範例中，  
+因為 `routes1` 的型別依然是 `{ "/": {}; "/users": {}; "/admin/users": {}; }`，  
+我們不能在 `routes1` 宣告後再附加 `"/dashboard": {}` 給它，因為不滿足型別定義。
+
+而 `routes2` 因為 Type Annotations 把型別直接變成 `{ [key: string]: {} }`，  
+所以我們可以再之後附加 `"/dashboard": {}` 給它。
+
+是否要嚴格或是寬鬆，完全取決於當下情境，  
+開發者必須根據情況判斷，  
+有沒有必要放寬型別，以及在當下放寬型別的好處跟壞處是什麼。
+
+### 連續 `satisfies`
+
+雖然我覺得這樣做的意義是 0，  
+不過理論上我們確實可以寫一次以上的 `satisfies`。
+
+```ts
+const routes1 = {
+  "/": {},
+  "/users": {},
+  "/admin/users": {},
+} satisfies { [key: string]: {} } satisfies { [key: string]: {}, "/": {}, "/users": {} }
+```
+
+連續 `satisfies` 就是會檢查最嚴格的那個型別。
+
+## `as`
+
+型別斷言 (Type Assertions) 是繞過 TypeScript 靜態型別檢查的方式，  
+最常見的應用場景是用在 runtime 時期才能得知具體型別的情境。
+
+例如以下範例
+
+```ts
+const myCanvas = document.getElementById("main_canvas") // const myCanvas: HTMLElement | null
+```
+
+`myCanvas` 被推斷出來的型別是 `HTMLElement | null`，  
+因為 TypeScript 在編譯時期是無法判斷 `document.getElementById("main_canvas")` 到底會給我們什麼型別，  
+頂多能確定拿到的可能是 `HTMLElement` 或是 `null`。
+
+如果開發者真的很確定一定拿得到 `document.getElementById("main_canvas")`，  
+並且一定是 `HTMLCanvasElement` 時，我們可以透過 `as` 來強迫 TypeScript Compiler 放行。
+
+```ts
+const myCanvas = document.getElementById("main_canvas") as HTMLCanvasElement; // const myCanvas: HTMLCanvasElement
+```
+
+在這個情境，我們無法使用 Type Annotations 或是 `satisfies`，  
+因為 `HTMLCanvasElement` 並非 `HTMLElement | null` 的 超集。
+
+```ts
+const myCanvas1: HTMLCanvasElement = document.getElementById("main_canvas");
+// Type 'null' is not assignable to type 'HTMLCanvasElement'.(2322)
+
+const myCanvas2  = document.getElementById("main_canvas") satisfies HTMLCanvasElement;
+// Type 'null' is not assignable to type 'HTMLCanvasElement'.(1360)
+```
+
+### `as` 的使用條件
+
+Type Assertions 也並非什麼型別都能賦予，  
+只能將原本的型別轉換成它的 超集 (superset) 或是 子集 (subset)。
+
+以下情況，即便用 `as`，TypeScript 依然會拋出錯誤。
+
+```ts
+const myname = 3 as string;
+// Conversion of type 'number' to type 'string' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.(2352)
+```
+
+但如果開發者就是故意要這麼做，可以先將型別換到最廣的，然後在換到其他型別去。
+
+```ts
+const myname1 = 3 as unknown as string; // const myname: string
+// or
+const myname2 = 3 as any as string; // const myname: string
+```
+
+上面的範例，是一種 可以做但不應該做 的程式範例。
+
+### 你可能不需要用到 `as`
+
+`as` 基本上就是告訴 TypeScript Compiler，你知道你在做什麼，你比 Compiler 更懂。
+
+但經過這麼多年的經驗總結下來，我得到的結論是：  
+通常 Compiler 是不會錯的，錯的是人。
+
+我們來看一些搬磚砸腳的例子，
+
+```ts
+type User = {
+  id: string;
+  name: {
+    first: string;
+    last: string;
+  };
+};
+
+function greeting(user: User) {
+  console.log(user.name.first + user.name.last);
+}
+
+const user = {} as User;
+greeting(user); // this will throw error during runtime
+```
+
+在上面的範例中，我們用 `as` 繞過了 TypeScript 的型別檢查。  
+這段程式碼在靜態型別檢查是可以成功的通過的，  
+但卻是段必定會在 runtime 階段發生錯誤的程式碼。
+
+問題的根源就在 `const user = {} as User`，  
+開發者認為，他清楚自己在做什麼，無視了 Compiler 的忠告。
+
+當我們試圖繞過 TypeScript 的靜態型別檢查，  
+我們就必須自行承擔它在 runtime 時期發生錯誤的風險。
+
+所以當我們在需要針對 runtime 階段才能得知的資料時，  
+除了用 `as` 來走 Compiler 後門之外，  
+我們應當優先考慮用 Type Guard 來確保資料符合我們預期的型別。
+
+## 個人比較推薦的做法
+
+不同於 Java 或 C# 等等傳統靜態型別語言，  
+我在寫 TypeScript 時，是遵循以下原則：
+
+- local variable 型別盡可能由 Type Inference 來推斷。
+- 函式 (both function and method) 的 Parameter 跟 Return Type 必須透過 Type Annotations 明確定義型別。
+
+因為我大部分是用 functional programming 在設計程式架構，  
+但如果我需要動用到 object oriented programming，  
+那就會多以下原則：
+
+- class member 如果沒有 initial value ，必須用 Type Annotations 明確定義型別。
+
+當我需要宣告較為複雜的 object 或是 array 時，  
+我會考慮用 `satisfies` 來做型別檢查。
+
+盡可能使用 Type Guard 來保障資料符合我的預期型別，盡可能不要用到 `as`。

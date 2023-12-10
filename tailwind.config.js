@@ -2,10 +2,9 @@
 module.exports = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    "./blogs/**/*.mdx",
+    //
   ],
   theme: {
     container: {
@@ -39,15 +38,15 @@ module.exports = {
       typography: {
         DEFAULT: {
           css: {
-            'code::before': {
-              content: '',
+            "code::before": {
+              content: "",
             },
-            'code::after': {
-              content: '',
-            }
-          }
-        }
-      }
+            "code::after": {
+              content: "",
+            },
+          },
+        },
+      },
     },
   },
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],

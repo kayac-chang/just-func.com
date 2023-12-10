@@ -3,8 +3,10 @@ import { useLoaderData } from "@remix-run/react";
 import { assert } from "@sindresorhus/is";
 import parseBlogServer from "~/services/parse-blog.server";
 import getBlogBySlugServer from "~/services/get-blog-by-slug.server";
-import parseFrontmatter from "~/services/parse-frontmatter.server";
 import Giscus from "@giscus/react";
+import { getMDXComponent } from "mdx-bundler/client/index.js";
+import { useMemo } from "react";
+import Exam from "~/components/Exam";
 
 export const meta: MetaFunction<typeof loader> = (args) =>
   args.data?.frontmatter.meta ?? [];
@@ -12,20 +14,22 @@ export const meta: MetaFunction<typeof loader> = (args) =>
 export async function loader(args: LoaderFunctionArgs) {
   assert.string(args.params.slug);
   return getBlogBySlugServer(args.params.slug).then((content) =>
-    Promise.all([parseFrontmatter(content), parseBlogServer(content)]).then(
-      ([frontmatter, body]) => ({
-        frontmatter,
-        body,
-      })
-    )
+    parseBlogServer(content)
   );
 }
 
 export default function Route() {
   const data = useLoaderData<typeof loader>();
+  const Component = useMemo(() => getMDXComponent(data.code), [data.code]);
   return (
     <main>
-      <article dangerouslySetInnerHTML={{ __html: data.body }}></article>
+      <article>
+        <Component
+          components={{
+            Exam,
+          }}
+        />
+      </article>
 
       <div className="max-w-screen-lg mx-auto md:px-16 mt-16 md:mt-32">
         <Giscus

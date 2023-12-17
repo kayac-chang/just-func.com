@@ -1,0 +1,115 @@
+---
+meta:
+  - title: 認識 Browser Extensions
+  - name: description
+    content: 認識 Browser Extensions，Browser Extensions 適用在哪些情境，有哪些範本。
+  - name: keywords
+    content: browser extensions, design
+  - name: og:image
+    content: https://images.unsplash.com/photo-1616499370260-485b3e5ed653
+
+published: 2023-12-09
+---
+
+# {frontmatter.meta[0].title}
+
+![Photo by picsum](https://images.unsplash.com/photo-1616499370260-485b3e5ed653)
+
+## 前言
+
+這可能會變成一個系列文。(希望我不要又忘記)
+
+因為前陣子，應公司要求開發了一個加密錢包的 Browser Extensions，  
+最近剛進 Beta 準備要釋出了。
+
+這是我第一次開發 Browser Extensions，很好玩但也很複雜，  
+資訊跟資源相對於一般 Web Application 相當不完整，  
+大部分都是要自己去看原文文件，  
+也有蠻多坑要避開。
+
+另外，同時也是我第一次開發 Crypto 領域的產品，  
+因為大部分的同事都只知道 Server 端的部分，  
+在 Client 的規格幾乎全部都要自己去看 bip 或是 eip 等等規格。
+
+於是，我會整理一下這段期間開發時研究到的知識。
+
+## 概述
+
+先從非技術的部分開始，   
+方便各位思考跟設計 Browser Extensions，  
+像是適用在哪種情境，能提供什麼類型的功能。
+
+Browser Extension 能在瀏覽器上附加更多功能，  
+讓我們能提供用戶更多便利的服務。
+
+## Browser Extension 的設計方向
+
+### 強化或完整化網站的原有功能
+
+這種應用方向可以在原本沒有提供某項功能的網站上，額外附加上新的功能。
+
+例如：[Amazon Assistant for Firefox][1] 在原本的 Amazon 上額外附加了 **價格比較** 的功能。
+![Amazon add-on example providing price comparison features][1-1]
+
+[1]: https://addons.mozilla.org/en-US/firefox/addon/amazon-browser-bar/
+[1-1]: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/What_are_WebExtensions/amazon_add_on.png
+
+### 提供用戶客製化體驗
+
+因為 Browser Extensions 可以對當前頁面進行改寫操作，  
+所以它可以讓用戶自行客製化頁面樣式或是如何顯示資訊。
+
+例如：[Dark Reader][2] 讓喜歡 Dark Theme 的用戶可以自行調整當前網頁的明暗度跟彩度樣式。
+![Dark Reader let user adjust dark theme on twich platform][2-1]
+
+[2]: https://addons.mozilla.org/en-US/firefox/addon/darkreader/
+[2-1]: https://addons.mozilla.org/user-media/previews/full/201/201069.png
+
+### 增加或移除網頁內容
+
+它也可以用於阻擋用戶不想看到的資訊，像是廣告，  
+或是當頁面提到某個城市或是國家時，提供旅遊指南，  
+或是對頁面進行重新排版來提供用戶更好的閱讀體驗。
+
+例如：[Adblocker][3] 可以用來阻擋廣告。
+![Banner of adblocker][3-1]
+
+[3]: https://addons.mozilla.org/en-US/firefox/addon/adblocker-ultimate/
+[3-1]: https://addons.mozilla.org/user-media/previews/full/240/240036.png
+
+### 增加新的工具或是瀏覽功能
+
+擴增用戶的瀏覽器功能，  
+像是在瀏覽器上附加 任務提醒，或是產生當前網址的 QR code 等等。
+
+例如：[Ticktick-todo][4] 可以在瀏覽器上附加任務提醒功能。
+![Ticktick-todo remind user don't forget to play song][4-1]
+
+[4]: https://addons.mozilla.org/en-US/firefox/addon/ticktick-todo/
+[4-1]: https://addons.mozilla.org/user-media/previews/full/194/194870.png
+
+### 遊戲
+
+可以在瀏覽器上附加電腦遊戲。
+
+例如：[接龍][5] 可以在瀏覽器上玩接龍。
+![solitaire][5-1]
+
+[5]: https://addons.mozilla.org/en-US/firefox/addon/solitaire-spider-freecell/
+[5-1]: https://addons.mozilla.org/user-media/previews/full/251/251572.png
+
+### 開發工具
+
+用戶如果是開發人員，那有的時候也需要用到 Browser Extensions 的開發工具。
+
+例如：[React Developer Tools][6]
+![react developer tools][6-1]
+
+[6]: https://addons.mozilla.org/en-US/firefox/addon/react-devtools/
+[6-1]: https://addons.mozilla.org/user-media/previews/full/223/223659.png
+
+## 參考範本
+
+MDN 提供了諸多 browser extensions 的[範例專案][7]可供我們參考。
+
+[7]: https://github.com/mdn/webextensions-examples

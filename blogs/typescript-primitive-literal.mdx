@@ -1,0 +1,463 @@
+---
+meta:
+  - title: TypeScript 原始型別跟純量型別
+  - name: description
+    content: 了解 TypeScript 原始型別跟純量型別，以及型別檢查的規則
+  - name: keywords
+    content: typescript, primitive types, literal types
+  - name: og:image
+    content: https://images.unsplash.com/photo-1582089319119-a788d9f9d976
+
+published: 2023-12-28
+---
+
+# {frontmatter.meta[0].title}
+
+![Photo by picsum](https://images.unsplash.com/photo-1582089319119-a788d9f9d976)
+
+## 導言
+
+因為這篇文章主要針對 TypeScript 的型別，  
+所以有關 JavaScript 的部分，會簡單帶過但會附上 MDN 的連結。
+
+TypeScript 作為 JavaScript 的超集 (superset)，  
+它的型別系統也必須符合 ECMAScript 的規範，  
+這篇文章中也會提及在一些常見的誤區。
+
+## 原始型別 Primitive Types
+
+TypeScript 的原始型別 ([Primitive Types][primitive]) 與 JavaScript 一樣，有以下幾種：
+
+[primitive]: https://developer.mozilla.org/en-US/docs/Glossary/Primitive
+
+- `boolean`
+- `number`
+- `string`
+- `symbol`
+- `bigint`
+- `null`
+- `undefined`
+
+關於有幾種原始型別會基於 ECMAScript 定義，撰文當下共有七種原始型別，  
+在未來的 ECMAScript 版本中可能會有所增加。
+
+### `typeof`
+
+在 JavaScript 中，我們可以透過 `typeof` 來判斷數值的型別，  
+而該規則在 TypeScript 中也是一樣的。
+
+例如說，  
+在 JavaScript 中，任一透過 `typeof` 得到為 `"number"` 的數值，  
+在 TypeScript 中都會被視為 `number` 型別。
+
+```ts
+let decLiteral = 6;
+  // ^? let decLiteral: number
+let hexLiteral = 0xf00d;
+  // ^? let hexLiteral: number
+let binaryLiteral = 0b1010;
+  // ^? let binaryLiteral: number
+let octalLiteral = 0o744;
+  // ^? let octalLiteral: number
+let notANumber = NaN;
+  // ^? let notANumber: number
+let infinityNumber = Infinity;
+  // ^? let infinityNumber: number
+```
+
+<Exam>
+<Exam.Question>
+以此類推，請問下面的 `result` 會判定成什麼型別？
+```ts
+let result = Math.random() < 0.5;
+ // ^?
+```
+</Exam.Question>
+<Exam.Answer>
+```ts
+let result = Math.random() < 0.5;
+ // ^? let result: boolean
+```
+</Exam.Answer>
+</Exam>
+
+### Primitive v.s. Object
+
+在 JavaScript 中，primitive types 是純量 (value) 而非物件 (object)，  
+而經由 constructor 建立的物件，則是 object。
+
+```javascript
+let s1 = new String();
+typeof s1; // 'object'
+
+let s2 = 'string;
+typeof s2; // 'string'
+```
+
+在 TypeScript 作為 JavaScript 的超集，在型別判定上也是如此。
+
+```ts
+let s1 = new String();
+ // ^? let s1: String
+
+let s2 = 'string';
+ // ^? let s2: string
+```
+
+上面 `s1` 的型別是 `interface String` 而非 `string`，  
+這是因為 `new String()` 會建立一個物件，  
+而該物件滿足 `interface String`。
+
+- <small>`string` 也是 `interface String` 的子集合，關於這點以後有機會會有另外一篇文章來說明。</small>
+
+### Primitive Types 的型別檢查
+
+```ts
+let s1: string;
+
+s1 = "hello";
+
+s1 = 123;
+// Type 'number' is not assignable to type 'string'.(2322)
+```
+
+以上我們可以看到，  
+當使用 `string` 來限制 `s1`，  
+我們可以賦予 `s1` 任何屬於 `string` 型別的數值，  
+但當我們嘗試傳入 `number` 型別的數值時就會拋錯。
+
+建議可以熟悉一下 TypeScript 編號 2322 錯誤訊息，  
+我們會很常看到這個錯誤訊息。
+
+- <small>關於 TypeScript 錯誤訊息 我們以後在跟大家講解。</small>
+
+## 純量型別 Literal Types
+
+下面提供幾種純量型別的範例，
+
+```ts
+type LiteralBoolean = true;
+  // ^? type LiteralBoolean = true;
+
+type LiteralNumber = 123;
+  // ^? type LiteralNumber = 123;
+
+type LiteralString = "string";
+  // ^? type LiteralString = "string";
+
+const s = Symbol('')
+type LiteralSymbol = typeof s;
+  // ^? type LiteralSymbol = typeof s;
+
+type LiteralBigint = 123n;
+  // ^? type LiteralBigint = 123n;
+
+type LiteralNull = null;
+  // ^? type LiteralNull = null;
+
+type LiteralUndefined = undefined;
+  // ^? type LiteralUndefined = undefined;
+```
+
+上面有三種比較特別的純量型別，`symbol`, `null` 跟 `undefined`，  
+會在下面進行討論。
+
+### `const` 會直接收斂到 Literal Types
+
+TypeScript 的型別系統會盡可能的收斂 (narrow) 型別。
+
+當我們使用 `const` 來宣告變數時，  
+TypeScript 型別推斷 [該變數無法被重新賦值][const-1]，  
+所以會直接收斂到 Literal Types。
+
+```ts
+const test1 = 'word';
+   // ^? const test1: 'word'
+```
+
+[const-1]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const#:~:text=just%20that%20the%20variable%20identifier%20cannot%20be%20reassigned
+
+但注意以下情況，
+
+```ts
+const oneHundred: bigint = BigInt(100);
+     // ^? const oneHundred: bigint
+
+const anotherHundred: bigint = 100n;
+     // ^? const anotherHundred: bigint
+```
+
+在上面的範例中，  
+因為我們透過 Type Annotation 來宣告 `oneHundred` 跟 `anotherHundred` 的型別為 `bigint`，  
+TypeScript 會直接使用 `bigint` 作為型別而非 `100n`。
+
+詳細可以參考 [TypeScript 如何給予型別](./typescript-how-to-type)。
+
+### 純量型別的型別檢查
+
+純量型別只能接受特定的數值。
+
+```ts
+let test1: string = 'word';
+test1 = 'another word';
+
+let test2: 'word' = 'word';
+test2 = 'another word';
+// Type '"another word"' is not assignable to type '"word"'.(2322)
+```
+
+在上面的範例中，`test1` 的型別是 `string`，  
+所以可以賦予任何屬於 `string` 型別的數值。  
+而 `test2` 的型別是 `'word'`，所以只能賦予 `'word'` 這個數值。
+
+### Literal Types 是 Primitive Types  的子集合
+
+請問下面的 `Test` 會判定成什麼型別？  
+
+```ts
+type Test = true | false;
+```
+
+答案是 `boolean`，  
+因為 `boolean` 這個型別的集合，只包含 `true` 跟 `false` 這兩個純量型別。
+
+Literal Types 是 Primitive Types 的子集合，  
+表示我們可以將 Literal Types 賦值給 Primitive Types。  
+
+```ts
+const word = "hello"
+   // ^? const word: "hello"
+
+let test1: string = word;
+
+declare function greet(test2: string): void;
+
+greet(word); // 註. 函式的參數也是賦值
+```
+
+- <small>關於 `|` 我們以後有機會在跟大家講解。</small>  
+- <small>關於 TypeScript 與 集合論 我們以後有機會在跟大家講解。</small>  
+
+
+### `symbol`
+
+`symbol` 是 JavaScript 中用來建立唯一值的型別，  
+唯一到只有 `symbol` 本身可以跟自己相等。
+
+所以，TypeScript Literal Types 的 `symbol` 型別，也是只能接受 `symbol` 自己本身。
+
+```ts
+const s1 = Symbol()
+  // ^? const s1: typeof s1
+
+const s2 = Symbol()
+  // ^? const s2: typeof s2
+
+type Test = typeof s1 & typeof s2;
+  // ^? type Test = never
+```
+
+- <small>關於 `&` 我們以後有機會在跟大家講解。</small>  
+- <small>關於 `typeof` 我們以後有機會在跟大家講解。</small>
+
+除了透過讓 TypeScript 推斷 `symbol` 型別，  
+如果我們想要用 Type Declaration 明確宣告型別，可以透過 `unique symbol` 來宣告。
+
+```ts
+const foo: unique symbol = Symbol();
+   // ^? const foo: typeof foo
+class Bar {
+     static readonly baz: unique symbol = Symbol();
+               //    ^? (property) Bar.baz: typeof Bar.baz
+}
+```
+
+注意，`unique symbol` 只能用在 `const` 跟 `static readonly` 上。
+
+另外，如果想要將 `symbol` 賦值到其他變數，並且要寫 Type Annotation 的話，  
+可以參考以下範例。
+
+```ts
+const foo: unique symbol = Symbol();
+
+const hello: typeof foo = foo;
+
+declare function fn(x: typeof foo): void;
+
+fn(foo);
+```
+
+上面可以看到，
+`hello` 的型別被明確宣告為 `typeof foo`，所以只能賦予 `foo` 這個 `symbol`，  
+同理，`fn` 的參數 `x` 的型別也被明確宣告為 `typeof foo`，所以只能傳入 `foo` 這個 `symbol`。
+
+- <small>關於 `class` 我們以後有機會在跟大家講解。</small>  
+
+### `null` 跟 `undefined`
+
+在 TypeScript 中，`null` 跟 `undefined` 是兩種不同的 **Literal Types**。
+
+```ts
+const foo = null;
+   // ^? const foo: null
+   
+const bar = undefined;
+   // ^? const bar: undefined
+```
+
+`null` 跟 `undefined` 用 `let` 宣告時，型別會是 `any`，
+
+```ts
+let foo = null;
+    // ^? let foo: any
+let bar = undefined;
+    // ^? let bar: any
+```
+
+原因跟以下這段程式碼一樣，
+
+```ts
+let baz;
+ // ^? let baz: any
+```
+
+因為 TypeScript 無法推斷 `foo`, `bar`, `baz` 的之後會被賦予什麼數值型別，  
+無法推斷的變數型別會是 `any`。
+
+關於型別推斷可以參考 [TypeScript 如何給予型別](./typescript-how-to-type)。
+
+
+#### `null` 跟 `undefined` 並非是其他型別的子集合
+
+因為它們是 Literal Types，所以在 **它們並非是其他型別的子集合**。
+
+曾經看到中文教程跟文章中有出現過：
+- ~`undefined` 和 `null` 是所有型別的子型別~
+- ~`undefined` 和 `null` 是特殊的子型別，可以賦值給任何型別~  
+
+以上是錯誤的。
+
+我想之所以常常被誤解是因為對 `strictNullChecks` 的誤解，  
+`strictNullChecks` 是 TypeScript 的一個 compiler option，   
+以下這邊提供了文件翻譯以及原文連結。
+
+當 `strictNullChecks` 被設定為 `false` 時，  
+`null` 跟 `undefined` 會被 TypeScript 直接忽略 ([reference][null-undefined-1])。
+
+當 `strictNullChecks` 被設定為 `true` 時，  
+`null` 跟 `undefined` 會具有自己不同的型別 ([reference][null-undefined-2])。
+
+所以，當我們將 `strictNullChecks` 設定為 `false` 時，  
+以下這段程式碼不會報錯的實際原因是，  
+TypeScript 直接忽略了 `null` 跟 `undefined`。
+
+```ts
+let num: number = undefined;
+```
+
+另外，我們可以透過 `&` 來檢驗 `null` 或 `undefined` 是否為某個型別的子集合。  
+
+```ts
+type NullTest1 = boolean & null;
+  // ^? type NullTest1 = never
+
+type NullTest2 = number & null;
+  // ^? type NullTest2 = never
+
+type NullTest3 = string & null;
+  // ^? type NullTest3 = never
+
+type NullTest4 = symbol & null;
+  // ^? type NullTest4 = never
+
+type NullTest5 = bigint & null;
+  // ^? type NullTest5 = never
+
+type NullTest6 = null & null;
+  // ^? type NullTest6 = null
+
+type NullTest7 = undefined & null;
+  // ^? type NullTest7 = never
+
+type UndefinedTest1 = boolean & undefined;
+  // ^? type UndefinedTest1 = never
+
+type UndefinedTest2 = number & undefined;
+  // ^? type UndefinedTest2 = never
+
+type UndefinedTest3 = string & undefined;
+  // ^? type UndefinedTest3 = never
+
+type UndefinedTest4 = symbol & undefined;
+  // ^? type UndefinedTest4 = never
+
+type UndefinedTest5 = bigint & undefined;
+  // ^? type UndefinedTest5 = never
+
+type UndefinedTest6 = null & undefined;
+  // ^? type UndefinedTest6 = never
+
+type UndefinedTest7 = undefined & undefined;
+  // ^? type UndefinedTest7 = undefined
+```
+
+只有 `null & null` 跟 `undefined & undefined` 不會是 `never`，  
+表示 `null` 跟 `undefined` 只會是自己的子集合。
+
+- <small>關於 tsconfig 我們以後有機會在跟大家講解。</small>  
+- <small>關於 `&` 我們以後有機會在跟大家講解。</small>  
+
+[null-undefined-1]: https://www.typescriptlang.org/tsconfig#strictNullChecks:~:text=When%20strictNullChecks%20is%20false%2C%20null%20and%20undefined%20are%20effectively%20ignored%20by%20the%20language.%20This%20can%20lead%20to%20unexpected%20errors%20at%20runtime.
+[null-undefined-2]: https://www.typescriptlang.org/tsconfig#strictNullChecks:~:text=When%20strictNullChecks%20is%20true%2C%20null%20and%20undefined%20have%20their%20own%20distinct%20types%20and%20you%E2%80%99ll%20get%20a%20type%20error%20if%20you%20try%20to%20use%20them%20where%20a%20concrete%20value%20is%20expected.
+
+## Primitive Types 跟 Literal Types 與 函式的參數
+
+以下範例，用 Primitive Types 來限制函式的參數
+
+```ts
+function greet(name: string): string {
+  return "Hello, " + name.toUpperCase() + "!!";
+}
+
+greet("Alice"); // "Hello, ALICE!!"
+
+greet(123);
+// Argument of type 'number' is not assignable to parameter of type 'string'.(2345)
+```
+
+以下範例，用 Literal Types 來限制函式的參數
+
+```ts
+function greet(name: "Alice"): string {
+  return "Hello, " + name.toUpperCase() + "!!";
+}
+
+greet("Alice"); // "Hello, ALICE!!"
+
+greet("Bob");
+// Argument of type '"Bob"' is not assignable to parameter of type '"Alice"'.(2345)
+```
+
+以上我們可以看到，  
+當我們使用 `string` 來限制函式的參數時，  
+我們可以傳入任何屬於 `string` 型別的數值，  
+但當我們嘗試傳入 `number` 型別的數值時就會拋錯。
+
+當我們使用 Literal Types `"Alice"` 來限制函式的參數時，  
+我們只能傳入 `"Alice"` 這個數值，  
+嘗試傳入其他數值時就會拋錯。
+
+另外，在錯誤的訊息中我們可以看到，  
+當參數型別為 `string` 拋出 `Argument of type 'number'`，  
+而當參數型別為 `"Alice"` 拋出 `Argument of type '"Bob"'`，  
+表示 TypeScript 的參數檢查以及錯誤訊息也會收斂 (narrow) 到 Literal Types。
+
+## 結論 Conclusion
+
+Primitive Type 與 Literal Type 是 TypeScript 型別系統的基礎，  
+TypeScript 作為 JavaScript 的超集，必須忠實的實作 ECMAScript 的規範，  
+在學習 TypeScript 時，其實也會回歸到 JavaScript 的基礎觀念。
+
+在後續的文章中，我們會看到如何透過 Primitive Type 與 Literal Type 來建構複雜的型別，  
+以及如何應用在實際的開發中。
+

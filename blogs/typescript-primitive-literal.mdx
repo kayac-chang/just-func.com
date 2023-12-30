@@ -344,6 +344,8 @@ let baz;
 當 `strictNullChecks` 被設定為 `false` 時，  
 `null` 跟 `undefined` 會被 TypeScript 直接忽略 ([reference][null-undefined-1])。
 
+<small>詳細來說是會被視為 `any` 型別，這個行為被稱作 Type Widening 以後有機會再跟讀者討論。</small>
+
 當 `strictNullChecks` 被設定為 `true` 時，  
 `null` 跟 `undefined` 會具有自己不同的型別 ([reference][null-undefined-2])。
 

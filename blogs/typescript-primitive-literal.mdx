@@ -41,7 +41,7 @@ TypeScript 的原始型別 ([Primitive Types][primitive]) 與 JavaScript 一樣�
 關於有幾種原始型別會基於 ECMAScript 定義，撰文當下共有七種原始型別，  
 在未來的 ECMAScript 版本中可能會有所增加。
 
-### `typeof`
+## `typeof`
 
 在 JavaScript 中，我們可以透過 `typeof` 來判斷數值的型別，  
 而該規則在 TypeScript 中也是一樣的。
@@ -81,7 +81,7 @@ let result = Math.random() < 0.5;
 </Exam.Answer>
 </Exam>
 
-### Primitive v.s. Object
+## Primitive v.s. Object
 
 在 JavaScript 中，primitive types 是純量 (value) 而非物件 (object)，  
 而經由 constructor 建立的物件，則是 object。
@@ -110,7 +110,7 @@ let s2 = 'string';
 
 - <small>`string` 也是 `interface String` 的子集合，關於這點以後有機會會有另外一篇文章來說明。</small>
 
-### Primitive Types 的型別檢查
+## Primitive Types 的型別檢查
 
 ```ts
 let s1: string;
@@ -162,7 +162,7 @@ type LiteralUndefined = undefined;
 上面有三種比較特別的純量型別，`symbol`, `null` 跟 `undefined`，  
 會在下面進行討論。
 
-### `const` 會直接收斂到 Literal Types
+## `const` 會直接收斂到 Literal Types
 
 TypeScript 的型別系統會盡可能的收斂 (narrow) 型別。
 
@@ -193,7 +193,7 @@ TypeScript 會直接使用 `bigint` 作為型別而非 `100n`。
 
 詳細可以參考 [TypeScript 如何給予型別](./typescript-how-to-type)。
 
-### 純量型別的型別檢查
+## 純量型別的型別檢查
 
 純量型別只能接受特定的數值。
 
@@ -210,7 +210,7 @@ test2 = 'another word';
 所以可以賦予任何屬於 `string` 型別的數值。  
 而 `test2` 的型別是 `'word'`，所以只能賦予 `'word'` 這個數值。
 
-### Literal Types 是 Primitive Types  的子集合
+## Literal Types 是 Primitive Types  的子集合
 
 請問下面的 `Test` 會判定成什麼型別？  
 
@@ -239,7 +239,7 @@ greet(word); // 註. 函式的參數也是賦值
 - <small>關於 TypeScript 與 集合論 我們以後有機會在跟大家講解。</small>  
 
 
-### `symbol`
+## `symbol`
 
 `symbol` 是 JavaScript 中用來建立唯一值的型別，  
 唯一到只有 `symbol` 本身可以跟自己相等。
@@ -293,9 +293,20 @@ fn(foo);
 
 - <small>關於 `class` 我們以後有機會在跟大家講解。</small>  
 
-### `null` 跟 `undefined`
+## `null` 跟 `undefined`
 
-在 TypeScript 中，`null` 跟 `undefined` 是兩種不同的 **Literal Types**。
+在 TypeScript 中，`null` 跟 `undefined` 是兩種不同的 **Literal Types**。  
+
+它們實際也有不同的意義，  
+`null` 表示 **該變數的值為空值**，
+而 `undefined` 表示 **該變數已經被宣告但尚未被賦予任何數值**。
+
+<small>
+但在實務操作上，我個人習慣一律使用 `undefined`。  
+這樣做可以減少對於判斷 `null` 跟 `undefined` 的情境，  
+在型別定義上也會比較簡單，因為可以直接使用 `?` 來表示該變數可以為 `undefined`。  
+關於 `?` 可以參考 [TypeScript 與物件型別](./typescript-object)。
+</small>
 
 ```ts
 const foo = null;
@@ -327,7 +338,7 @@ let baz;
 關於型別推斷可以參考 [TypeScript 如何給予型別](./typescript-how-to-type)。
 
 
-#### `null` 跟 `undefined` 並非是其他型別的子集合
+## `null` 跟 `undefined` 並非是其他型別的子集合
 
 因為它們是 Literal Types，所以在 **它們並非是其他型別的子集合**。
 
@@ -454,7 +465,7 @@ greet("Bob");
 而當參數型別為 `"Alice"` 拋出 `Argument of type '"Bob"'`，  
 表示 TypeScript 的參數檢查以及錯誤訊息也會收斂 (narrow) 到 Literal Types。
 
-## 結論 Conclusion
+## 總結 Conclusion
 
 Primitive Type 與 Literal Type 是 TypeScript 型別系統的基礎，  
 TypeScript 作為 JavaScript 的超集，必須忠實的實作 ECMAScript 的規範，  

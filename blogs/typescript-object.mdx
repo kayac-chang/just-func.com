@@ -1,0 +1,706 @@
+---
+meta:
+  - title: TypeScript 與物件型別
+  - name: description
+    content: 
+  - name: keywords
+    content: 
+  - name: og:image
+    content: https://images.unsplash.com/photo-1582089319119-a788d9f9d976
+
+published: 2023-12-29
+---
+
+# {frontmatter.meta[0].title}
+
+這篇文章會聚焦在 TypeScript 型別上，所以不會提到太多 JavaScript 的基本觀念，  
+如果不熟悉 JavaScript 的物件 (Object)，可以參考 [MDN - Object][object]。
+
+[object]: https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Basics
+
+## 物件 Object
+
+在 JavaScript 中，我們可以透過 `{}` 來直接建立物件，  
+稱為 物件初始化 ([Object Initializer][object_initializer])。
+
+[object_initializer]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer
+
+```ts
+const vec = {
+  //  ^? const vec: { x: number; y: number; }
+  x: 0,
+  y: 0,
+};
+
+let vec = {
+  //^? let vec: { x: number; y: number; }
+  x: 0,
+  y: 0,
+};
+```
+
+在上面的範例中，我們並沒有明確標註 `vec` 的型別，  
+透過 TypeScript 推斷出來的型別是 `{ x: number; y: number; }`。
+
+<small>
+注意，使用 `let` 或是 `const` 也是會影響到型別資訊。  
+在接下來的範例，也會分別提供使用 `let` 跟 `const` 後得到的型別。
+</small>
+
+<small>
+關於 TypeScript 的型別推斷 (Type Inference) 可以參考 [TypeScript 如何給予型別](./typescript-how-to-type)。
+</small>
+
+## 語法 Syntax
+
+以下示範 物件型別 的型別標註。
+
+```ts
+{ x: number; y: number; }
+{ x: number; y: number }
+{ x: number, y: number, }
+{ x: number, y: number }
+```
+
+上面可以看到，  
+我們標注了一個具有兩個屬性 (properties) 的型別，  
+分別是 `x` 跟 `y`，而且都是 `number` 型別。  
+我們可以使用 `,` 或是 `;` 來分隔屬性，  
+而且最後一個分隔符號可以選擇性忽略。
+
+
+## 型別標註 Type Annotation
+
+以下示範 物件型別 的型別標註。
+
+```ts
+const vec: { x: number; y: number; } = {
+   x: 0,
+   y: 0,
+};
+
+let vec: { x: number; y: number; } = {
+  x: 0,
+  y: 0,
+};
+```
+
+同理，我們可以用同樣的方式來標註函式參數 (Function Parameter) 以及 函式回傳值 (Function Return Value)。
+
+```ts
+declare function move(vec: { x: number; y: number; }): { x: number; y: number; };
+
+move({ x: 0, y: 0 });
+
+const vec1 = { x: 0, y: 0 };
+move(vec1);
+
+let vec2 = { x: 0, y: 0 };
+move(vec2);
+```
+
+<small>我們以後有機會介紹 函式型別 (Function Type)。</small>
+
+## 型別別名 與 介面 的物件型別標註法
+
+當然，我們可以直接針對每個 variable 進行個別物件型別標註，  
+但透過 型別別名 (Type Alias) 跟 介面 (Interface) 將型別標註獨立出來，  
+可以讓多個 variable 可以共用同一個型別標註。
+
+以下是 Type Alias 的寫法。
+
+```ts
+type Vec = { x: number; y: number; };
+
+const vec: Vec = {
+   x: 0,
+   y: 0,
+};
+
+let vec: Vec = {
+   x: 0,
+   y: 0,
+};
+
+declare function move(vec: Vec): Vec;
+```
+
+以下是 Interface 的寫法。
+
+```ts
+interface Vec {
+  x: number;
+  y: number;
+}
+
+const vec: Vec = {
+   x: 0,
+   y: 0,
+};
+
+let vec: Vec = {
+   x: 0,
+   y: 0,
+};
+
+declare function move(vec: Vec): Vec;
+```
+
+<small>以後有機會我們會再深度探討 Type Alias 與 Interface。</small>
+
+## 屬性型別 Property Type
+
+在物件中每個屬性也都有自己的型別，  
+TypeScript 會特別在型別資訊上標註 (property) 來表示這是一個屬性。
+
+```ts
+const vec = {
+   x: 0,
+// ^? (property) x: number
+   y: 0,
+// ^? (property) y: number
+};
+```
+
+## 型別檢查 Type Checks
+
+型別檢查 (Type Checks) 是 TypeScript 重要的功能之一，    
+認識它的錯誤訊息 (Error Message) 是了解這套語言的重要一環。
+
+以下會介紹一些常見的物件型別檢查錯誤訊息。
+
+### 重複屬性 Duplicate Property
+
+在 JavaScript 物件初始化時，屬性是可以重複定義的。  
+但 TypeScript 會拋出錯誤訊息 `1117`。
+
+```ts
+type Vec = { x: number; y: number; };
+
+const vec: Vec = {
+  x: 0,
+  y: 0,
+  x: 0,
+//^ An object literal cannot have multiple properties with the same name.(1117)
+};
+```
+
+以開發的角度來看，這個錯誤訊息是很合理的，  
+在物件初始化時，定義屬性重複大多數是開發者的失誤，  
+透過這道檢查，可以避免開發者定義無意義的重複屬性，  
+以避免誤導後續維護者的可能。
+
+### 多餘屬性 Excess Property Checks
+
+在物件初始化時，開發者定義的屬性超出型別所定義的屬性時，  
+TypeScript 會拋出錯誤訊息 `1117`。
+
+```ts
+type Vec = { x: number; y: number; };
+
+const vec: Vec = {
+   x: 0,
+   y: 0,
+   z: 0,
+// ^ Object literal may only specify known properties, and 'z' does not exist in type 'Position'.(2353)
+};
+
+let vec: Vec = {
+   x: 0,
+   y: 0,
+   z: 0,
+// ^ Object literal may only specify known properties, and 'z' does not exist in type 'Position'.(2353)
+};
+```
+
+關於多餘屬性的檢查，以下來討論一個常見的問題。  
+請問下面的 `move(vec)` 會拋錯嗎？
+
+```ts
+interface Vec {
+  x: number;
+  y: number;
+}
+
+declare function move(vec: Vec): Vec;
+
+const vec = {
+  x: 0,
+  y: 0,
+  z: 0,
+};
+
+// error ?
+move(vec);
+```
+
+這邊提供 [TypeScript Playground][playground-1] 供讀者參考。
+[playground-1]: https://www.typescriptlang.org/play?noImplicitAny=false&target=2#code/JYOwLgpgTgZghgYwgAgGoQcg3gKGcgDwC5kQBXAWwCNoBuPZATxPOrpwF8ccATDAGzhQUMMiARhgAexDIKUgG4QAFEoQl0CAJQaM9HAhkBnMMjXIAvNgbFkABgA0DZvaf4AXiUed9Ael-I0FBSUMgA-DjySqoYWrRAA
+
+同樣的，請問下面的 `move({ x: 0, y: 0, z: 0 })` 會拋錯嗎？
+
+```ts
+interface Vec {
+  x: number;
+  y: number;
+}
+
+declare function move(vec: Vec): Vec;
+
+// error ?
+move({ x: 0, y: 0, z: 0 });
+```
+這邊也提供 [TypeScript Playground][playground-2] 供讀者參考。
+[playground-2]: https://www.typescriptlang.org/play?noImplicitAny=false&target=2#code/JYOwLgpgTgZghgYwgAgGoQcg3gKGcgDwC5kQBXAWwCNoBuPZATxPOrpwF8ccATDAGzhQUMMiARhgAexDIKUgG4QAFEoQl0CAJQaM9HAHoDyaFClRkAfhzylyrIRIAGADRNnbgF7PkHLbSA
+
+為什麼 `move(position)` 不會拋錯，  
+但 `move({ x: 0, y: 0, z: 0 })` 卻會拋錯呢？  
+
+TypeScript 團隊認為，物件初始化階段多餘的屬性是多數情況屬於失誤，  
+避免錯誤發生會比起容許這個情況的效益來得大，  
+所以 TypeScript 會在物件初始化階段嚴格檢查多餘的屬性。
+
+且開發者可以透過 tsconfig [suppressExcessPropertyErrors] 選項，  
+自行斟酌是否開啟這項檢查。
+
+[suppressExcessPropertyErrors]: https://www.typescriptlang.org/tsconfig#suppressExcessPropertyErrors
+
+<small>
+有興趣現在深入研究的讀者，這邊提供對應的 [Issues][issues-3755] 與 [PR][pull-3823] 以供參考。
+
+[issues-3755]: https://github.com/microsoft/TypeScript/issues/3755
+[pull-3823]: https://github.com/microsoft/TypeScript/pull/3823
+</small>
+
+<Exam>
+<Exam.Question>
+以此類推，請問下面的 `move_impl_1` 跟 `move_impl_2` 哪一個會拋錯？
+```ts
+interface Vec {
+  x: number;
+  y: number;
+}
+
+function move_impl_1(): Vec {
+  const result = { x: 0, y: 0, z: 0 };
+  return result
+}
+
+function move_impl_2(): Vec {
+  return { x: 0, y: 0, z: 0 }
+}
+```
+</Exam.Question>
+<Exam.Answer>
+[TypeScript Playground][playground-3]
+[playground-3]: https://www.typescriptlang.org/play?noImplicitAny=false&target=2#code/JYOwLgpgTgZghgYwgAgGoQcg3gKGcgDwC5kQBXAWwCNoBuPZATxPOrpwF8ccYyQEwwAPYhkFIQDcIAfWAUADgBtpARgAUAShLpMufAhEBnMMigRDZRSYC82QiQAMAGiaOXAL0fIO9fGbBkUKJmFlac3Lz8giJikjJyStIATJraGNgM-oGiWPbIzq75Hl5cHEA
+</Exam.Answer>
+</Exam>
+
+如果我們真的想要讓物件初始化時可以有多餘的屬性，  
+我們可以使用 Index Signature 明確的告知這個物件可以接受任意屬性名 (property key)。  
+在下面我們會介紹 Index Signature 的詳細用法。
+
+```ts
+interface Config {
+  x: number;
+  y: number;
+  [key: string]: number;
+}
+
+declare function defineConfig(config: Config): Config;
+
+defineConfig({ x: 0, y: 0, z: 0 });
+```
+
+## 屬性修飾符 Property Modifiers
+
+在物件中，屬性可以透過修飾 (Modifiers) 來調整屬性的行為，  
+以下會介紹三種屬性修飾。
+
+### 可選 Optional 
+
+Optional 譯作 可選 或是 可為空，  
+以下使用 可選 進行翻譯因為比較貼近實際情況。
+
+#### 語法 Syntax
+
+很多時候，我們會遇到物件中的某個屬性不一定存在，  
+這時候我們可以在屬性名後面加上 `?` 來表示該屬性可選。
+
+```ts
+type Vec = { x: number; y?: number; };
+
+interface Vec {
+  x: number;
+  y?: number;
+}
+```
+
+以下示範，當我們將 `y` 設定為可選時，  
+`vec1` 跟 `vec2` 都是合法的物件初始化。
+
+```ts
+type Vec = { x: number; y?: number; };
+
+const vec1: Vec = {
+  x: 0,
+};
+
+const vec2: Vec = {
+  x: 0,
+  y: 0,
+};
+
+const vec3: Vec = {
+//    ^^^^^^^^^ Property 'x' is missing in type '{ y: number; }' but required in type 'Position'.(2741)
+  y: 0,
+};
+```
+
+上面看到 `vec3` 會拋錯，  
+因為 `x` 是必要屬性，但 `vec3` 卻沒有定義 `x`。
+
+#### 可選屬性型別 Optional Property Type
+
+被標示成可選的屬性，其型別會被標示成 `T | undefined` (`T` 是該屬性的型別)。  
+
+```ts
+type Vec = { x: number; y?: number; };
+
+declare const vec: Vec;
+
+vec.x;
+  //^? (property) x: number
+vec.y;
+  //^? (property) y?: number | undefined
+vec.x + vec.y;
+//      ^^^^^ 'position.y' is possibly 'undefined'.(18048)
+```
+
+上面可以看到，  
+`vec.y` 的型別是 `number | undefined`，  
+所以當我們在 `vec.x + vec.y` 嘗試使用 `vec.y` 時，  
+TypeScript 會拋出錯誤訊息 `18048`，  
+試圖提醒開發者 `vec.y` 可能是 `undefined`。
+
+另外要注意，可選的屬性型別是 `T | undefined` 而不是 `T | null`，  
+以下範例可以看到，當我們試圖將 `null` 賦值給可為空的屬性時，  
+TypeScript 會拋出錯誤訊息 `2322`。
+
+```ts
+type Vec = { x: number; y?: number; };
+
+declare const vec: Vec;
+
+  vec.y = null;
+//^^^^^ Type 'null' is not assignable to type 'number | undefined'.(2322)
+```
+
+<small>
+在 TypeScript 中，`null` 跟 `undefined` 是不同型別，  
+JavaScript 中所代表的意義也不同，  
+詳細可以參考 [TypeScript 原始型別跟純量型別](./typescript-primitive-literal)。
+</small>
+
+#### 如何妥善處理可選屬性
+
+對於 可選屬性的檢查 以及 妥善的處理 可以大大減少程式的出錯的概率。
+
+##### 1. 使用判斷式確認屬性是否存在
+
+這個作法也被稱作 型別限縮 Narrowing。
+
+<small>我們以後會在討論 Narrowing。</small>
+
+```ts
+type Vec = { x: number; y?: number; };
+
+function abs(vec: Vec) {
+  if (vec.y) {
+    return Math.sqrt(vec.x ** 2 + vec.y ** 2);
+  }
+  return Math.abs(vec.x);
+}
+```
+
+使用三元運算子也可以達到同樣的效果。
+
+```ts
+type Vec = { x: number; y?: number; };
+
+function abs(vec: Vec) {
+  return vec.y ? 
+    Math.sqrt(vec.x ** 2 + vec.y ** 2) : 
+    Math.abs(vec.x);
+}
+```
+
+##### 2. 給予預設值
+
+根據情境，我們透過可以給予預設值來排除 `undefined` 的可能性。
+
+```ts
+type Vec = { x: number; y?: number; };
+
+function abs(vec: Vec) {
+  vec.y = vec.y ?? 0;
+  //  ^? (property) y?: number | undefined
+  return Math.sqrt(vec.x ** 2 + vec.y ** 2);
+  //                                ^? (property) y?: number
+}
+```
+
+在 解構賦值 (Destructuring Assignment) 時，可以給予預設值來達到同樣的效果。
+
+```ts
+function abs({ x, y = 0 }: Vec) {
+  return Math.sqrt(x ** 2 + y ** 2);
+  //                        ^? (parameter) y: number
+}
+```
+
+##### 3. 非空斷言
+
+非空斷言 (Non-null Assertion) 是 TypeScript 用來讓開發者繞過型別檢查的方法，  
+這個方法可以讓開發者強制 TypeScript 認為某個值不會是 `null` 或是 `undefined`。
+
+```ts
+type Vec = { x: number; y?: number; };
+
+function abs(vec: Vec) {
+  vec.y = vec.y!;
+  //  ^? (property) y?: number | undefined
+  return Math.sqrt(vec.x ** 2 + vec.y ** 2);
+  //                                ^? (property) y?: number
+}
+
+function abs(vec: Vec) {
+  return Math.sqrt(vec.x ** 2 + vec.y! ** 2);
+}
+```
+
+這個作法實際上就是讓開發者自行承擔出錯風險，所以在使用時要特別小心。
+
+## 唯獨 Readonly 
+
+唯讀 (Readonly) 可以在物件初始化時，標示某個屬性不可被修改。
+
+### 語法 Syntax
+
+我們可以在屬性型別前面加上 `readonly` 來標示該屬性為唯讀。
+
+```ts
+type Vec = { x: number; readonly y: number; };
+
+interface Vec {
+  x: number;
+  readonly y: number;
+}
+```
+
+### 型別檢查 Type Checks
+
+當開發者嘗試修改唯讀屬性時，TypeScript 會拋出錯誤訊息 `2540`。
+
+```ts
+type Vec = { x: number; readonly y: number; };
+
+declare const vec: Vec;
+
+vec.x;
+vec.x = 0;
+
+vec.y;
+vec.y = 0;
+//  ^ Cannot assign to 'y' because it is a read-only property.(2540)
+```
+
+可惜，唯獨屬性 目前在型別資訊上並沒有特別標示出來，  
+希望未來 TypeScript 團隊可以標示。
+
+```ts
+type Vec = { x: number; readonly y: number; };
+
+declare const vec: Vec;
+
+vec.y;
+//  ^? (property) y: number
+```
+
+### 巢狀 Nested
+
+注意到，唯獨屬性只會影響到該屬性，並不會影響到巢狀物件的屬性。  
+(嚴格來說，巢狀的物件就已經算是另一個物件了。)
+
+```ts
+type Rectangle = {
+  readonly position: { x: number; y: number; };
+}
+
+declare const rect: Rectangle;
+
+rect.position.x = 0;
+rect.position.y = 0;
+
+rect.position = {
+  // ^^^^^^^^ Cannot assign to 'position' because it is a read-only property.(2540)
+  x: 0,
+  y: 0,
+}
+```
+
+### 讀寫分離 Read Write Separation
+
+我們可以用 唯獨屬性 來試著達到 讀寫分離 (Read Write Separation) 的設計。
+
+```ts
+type Position = { x: number; y: number; };
+type ReadonlyPosition = { readonly x: number; readonly y: number; };
+
+const position: Position = { x: 0, y: 0 };
+
+const readonlyPosition: ReadonlyPosition = position;
+
+position.x = 1;
+position.y = 1;
+
+readonlyPosition.x = 1;
+              // ^ Cannot assign to 'x' because it is a read-only property.(2540)
+readonlyPosition.y = 1;
+              // ^ Cannot assign to 'y' because it is a read-only property.(2540)
+```
+
+<small>
+雖然實務上我不太會這樣做，  
+我日常的設計主要以函式編程 (Functional Programming) 為主，  
+不太會出現 `position.x = 1` 這種寫法的情況。
+</small>
+
+### 唯獨型別 Readonly
+
+`Readonly<T>` 是 TypeScript 提供的工具型別 (Utility Types)，  
+可以將 `T` 的所有屬性都標示為唯獨。
+
+例如，呈上面的範例，  
+我們可以透過 `Readonly<T>` 來將 `Position` 的所有屬性都標示為唯獨。
+
+```ts
+type Position = { x: number; y: number; };
+
+type ReadonlyPosition = Readonly<Position>;
+//   ^? type ReadonlyPosition = { readonly x: number; readonly y: number; }
+```
+
+`Readonly<T>` 只會作用在第一層的屬性，  
+所以巢狀的物件屬性並不會被標示為唯獨。
+
+```ts
+type Rectangle = {
+  position: { x: number; y: number; };
+}
+
+type ReadonlyRectangle = Readonly<Rectangle>;
+//   ^? type ReadonlyRectangle = { readonly position: { x: number; y: number; }; }
+```
+
+### `as const`
+
+我們也可以透過 `as const` 在物件初始化時將所有屬性都標示為唯獨。
+
+```ts
+const position = { x: 0, y: 0 } as const;
+   // ^? const position: { readonly x: 0; readonly y: 0; }
+```
+
+`as const` 也會作用在巢狀的物件屬性。
+
+```ts
+const rectangle = {
+    //^? const rectangle: { readonly position: { readonly x: 0; readonly y: 0; }; }
+    position: { x: 0, y: 0 }
+} as const;
+```
+
+## Property Modifiers - Index Signature
+
+### Syntax
+
+```ts
+type Mapping = {
+  [index: string]: string;
+}
+
+interface Mapping {
+  [index: string]: string;
+}
+
+const mapping: { [index: string]: string } = {};
+```
+
+Only some types are allowed for index signature properties: 
+string, number, symbol, template string patterns, and union types consisting only of these.
+
+### Empty Object
+
+```ts
+type Mapping = {
+  [index: string]: string;
+}
+
+const mapping1 = {};
+mapping1.x = 'hello';
+      // ^ Property 'x' does not exist on type '{}'.(2339)
+mapping1.y = 'world';
+      // ^ Property 'y' does not exist on type '{}'.(2339)
+
+const mapping2: { [index: string]: string } = {}
+mapping2.x = 'hello';
+mapping2.y = 'world';
+```
+
+### Enforce Properties
+
+```ts
+type Mapping = {
+  [index: string]: string;
+  name: number;
+//^^^^ Property 'name' of type 'number' is not assignable to 'string' index type 'string'.(2411)
+}
+```
+
+```ts
+type Mapping = {
+  [index: string]: string | number;
+  name: number;
+}
+```
+
+### Readonly Index Signature
+
+```ts
+type Mapping = {
+  readonly [index: string]: string;
+}
+
+const mapping: Mapping = {};
+
+   mapping.x = '1'
+// ^^^^^^^^^ Index signature in type 'Mapping' only permits reading.(2542)
+```
+
+### Array
+
+```ts
+type Indexable = {
+  [index: number]: string;
+}
+
+const array: Indexable = [
+  'hello'
+];
+
+array[0]; // 'hello'
+
+array[1] = 'world';
+```

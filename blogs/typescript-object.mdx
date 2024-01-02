@@ -2,16 +2,18 @@
 meta:
   - title: TypeScript 與物件型別
   - name: description
-    content: 
+    content: 介紹 TypeScript 的 object 型別標註，有關 object 的 type check，什麼是 property modifiers，以及有哪些 property modifiers
   - name: keywords
-    content: 
+    content: typescript, object, property modifiers, optional, readonly, index signature
   - name: og:image
-    content: https://images.unsplash.com/photo-1582089319119-a788d9f9d976
+    content: https://images.unsplash.com/photo-1527689638836-411945a2b57c
 
-published: 2023-12-29
+published: 2024-01-02
 ---
 
 # {frontmatter.meta[0].title}
+
+![Photo by picsum](https://images.unsplash.com/photo-1527689638836-411945a2b57c)
 
 這篇文章會聚焦在 TypeScript 型別上，所以不會提到太多 JavaScript 的基本觀念，  
 如果不熟悉 JavaScript 的物件 (Object)，可以參考 [MDN - Object][object]。
@@ -165,7 +167,7 @@ const vec = {
 ## 型別檢查 Type Checks
 
 型別檢查 (Type Checks) 是 TypeScript 重要的功能之一，    
-認識它的錯誤訊息 (Error Message) 是了解這套語言的重要一環。
+認識錯誤訊息 (Error Message) 是了解這套語言的重要一環。
 
 以下會介紹一些常見的物件型別檢查錯誤訊息。
 
@@ -235,6 +237,7 @@ move(vec);
 ```
 
 這邊提供 [TypeScript Playground][playground-1] 供讀者參考。
+
 [playground-1]: https://www.typescriptlang.org/play?noImplicitAny=false&target=2#code/JYOwLgpgTgZghgYwgAgGoQcg3gKGcgDwC5kQBXAWwCNoBuPZATxPOrpwF8ccATDAGzhQUMMiARhgAexDIKUgG4QAFEoQl0CAJQaM9HAhkBnMMjXIAvNgbFkABgA0DZvaf4AXiUed9Ael-I0FBSUMgA-DjySqoYWrRAA
 
 同樣的，請問下面的 `move({ x: 0, y: 0, z: 0 })` 會拋錯嗎？
@@ -251,17 +254,17 @@ declare function move(vec: Vec): Vec;
 move({ x: 0, y: 0, z: 0 });
 ```
 這邊也提供 [TypeScript Playground][playground-2] 供讀者參考。
+
 [playground-2]: https://www.typescriptlang.org/play?noImplicitAny=false&target=2#code/JYOwLgpgTgZghgYwgAgGoQcg3gKGcgDwC5kQBXAWwCNoBuPZATxPOrpwF8ccATDAGzhQUMMiARhgAexDIKUgG4QAFEoQl0CAJQaM9HAHoDyaFClRkAfhzylyrIRIAGADRNnbgF7PkHLbSA
 
-為什麼 `move(position)` 不會拋錯，  
-但 `move({ x: 0, y: 0, z: 0 })` 卻會拋錯呢？  
+#### 為什麼 `move(vec)` 不會拋錯，但 `move({ x: 0, y: 0, z: 0 })` 卻會拋錯呢？  
 
 TypeScript 團隊認為，物件初始化階段多餘的屬性是多數情況屬於失誤，  
 避免錯誤發生會比起容許這個情況的效益來得大，  
 所以 TypeScript 會在物件初始化階段嚴格檢查多餘的屬性。
 
-且開發者可以透過 tsconfig [suppressExcessPropertyErrors] 選項，  
-自行斟酌是否開啟這項檢查。
+且透過 tsconfig [suppressExcessPropertyErrors] 選項，  
+開發者可以自行斟酌是否開啟這項檢查。
 
 [suppressExcessPropertyErrors]: https://www.typescriptlang.org/tsconfig#suppressExcessPropertyErrors
 
@@ -293,6 +296,7 @@ function move_impl_2(): Vec {
 </Exam.Question>
 <Exam.Answer>
 [TypeScript Playground][playground-3]
+
 [playground-3]: https://www.typescriptlang.org/play?noImplicitAny=false&target=2#code/JYOwLgpgTgZghgYwgAgGoQcg3gKGcgDwC5kQBXAWwCNoBuPZATxPOrpwF8ccYyQEwwAPYhkFIQDcIAfWAUADgBtpARgAUAShLpMufAhEBnMMigRDZRSYC82QiQAMAGiaOXAL0fIO9fGbBkUKJmFlac3Lz8giJikjJyStIATJraGNgM-oGiWPbIzq75Hl5cHEA
 </Exam.Answer>
 </Exam>
@@ -312,6 +316,28 @@ declare function defineConfig(config: Config): Config;
 
 defineConfig({ x: 0, y: 0, z: 0 });
 ```
+
+### 型別索引訪問 Indexed Access Types
+
+因為語法很接近，所以這邊稍微提及一下。
+
+在 TypeScript 中，  
+我們可以把型別本身當作一種值，  
+可以透過 `[]` 來訪問型別中的屬性型別。
+
+```ts
+interface Vec {
+  x: number;
+  y: number;
+}
+
+type X = Vec['x'];
+   //^? type X = number
+```
+
+<small>
+關於 Indexed Access Types，我們以後會在 TypeScript 進階型別討論。
+</small>
 
 ## 屬性修飾符 Property Modifiers
 
@@ -401,6 +427,14 @@ declare const vec: Vec;
 在 TypeScript 中，`null` 跟 `undefined` 是不同型別，  
 JavaScript 中所代表的意義也不同，  
 詳細可以參考 [TypeScript 原始型別跟純量型別](./typescript-primitive-literal)。
+</small>
+
+<small>
+實務上，我通常不太去區分 `null` 跟 `undefined` (因為沒必要又很麻煩)，  
+我已經很習慣使用 [nullish] 的概念去處理空值的情況。
+以後有機會我們會再深度探討。
+
+[nullish]: https://developer.mozilla.org/en-US/docs/Glossary/Nullish
 </small>
 
 #### 如何妥善處理可選屬性
@@ -622,9 +656,25 @@ const rectangle = {
 } as const;
 ```
 
-## Property Modifiers - Index Signature
+注意到，`as const` 不只是會將屬性標示為唯獨，屬性的值也會收斂成 `Literal Type`。
 
-### Syntax
+<small>
+關於 Literal Type 可以參考 [TypeScript 原始型別跟純量型別](./typescript-primitive-literal)。
+</small>
+
+## Index Signature
+
+在 JavaScript 中的物件 (Object) 是類似 Hash Map 的存在，  
+可以接受任意屬性名 (property key)，也可以在 Runtime 時動態的新增屬性，  
+這樣的特性提供了很大開發彈性，但也相對容易造成維護時的麻煩。
+
+TypeScript 對於物件這樣的彈性進行了一定程度限制，  
+並非每個物件都可以接受任意屬性名，  
+必須透過 Index Signature 來明確告知該物件可以接受任意屬性名。
+
+### 語法 Syntax
+
+Index Signature 可以用來標示物件可以接受任意屬性名 (property key)。
 
 ```ts
 type Mapping = {
@@ -638,28 +688,54 @@ interface Mapping {
 const mapping: { [index: string]: string } = {};
 ```
 
-Only some types are allowed for index signature properties: 
-string, number, symbol, template string patterns, and union types consisting only of these.
+我們透過 `[index: string]` 來標示物件的屬性名可以是任意的 `string` 型別，  
+而屬性的值型別必須是 `string`。
 
-### Empty Object
+注意到，  
+只有 `string`、`number`、`symbol`、`template string patterns`、`union types`  
+可以用來當作 Index Signature 的屬性名。
+
+<small>
+關於 `string`、`number`、`symbol` 可以參考 [TypeScript 原始型別跟純量型別](./typescript-primitive-literal)。
+</small>
+<small>
+關於 `template string patterns`、`union types` 我們以後會在討論。
+</small>
+
+### 空物件型別 Empty Object
+
+當在 TypeScript 宣告空物件但沒有任何型別標注時，  
+TypeScript 會推斷出 `{}` 型別。
+
+空物件型別無法在初始化之後新增屬性。
 
 ```ts
-type Mapping = {
-  [index: string]: string;
-}
-
 const mapping1 = {};
 mapping1.x = 'hello';
       // ^ Property 'x' does not exist on type '{}'.(2339)
 mapping1.y = 'world';
       // ^ Property 'y' does not exist on type '{}'.(2339)
+```
 
+所以，如果我們想要類似 Hash Map 的行為，  
+必須透過 Index Signature 來明確告知該物件可以接受任意屬性名。
+
+```ts
 const mapping2: { [index: string]: string } = {}
 mapping2.x = 'hello';
 mapping2.y = 'world';
 ```
 
-### Enforce Properties
+<small>
+空物件型別本身並不是很有用，但它卻是多數型別的超集 (superset)。  
+以後有空我們會來討論 TypeScript 與集合論。
+</small>
+
+### 強迫屬性型別 Enforce Properties
+
+請注意以下範例，
+我們已經用 Index Signature 標註這個物件的屬性值型別是 `string`，  
+但我們卻在物件中定義了 `name` 屬性型別是 `number`。
 
 ```ts
 type Mapping = {
@@ -669,6 +745,13 @@ type Mapping = {
 }
 ```
 
+TypeScript 會拋出錯誤訊息 `2411`，  
+告知開發者 `name` 屬性的型別 `number` 並不是 `string` 的子型別，  
+在標註 Index Signature 後，  
+任何屬性值以及屬性名的型別都符合 Index Signature 的型別標註要求。
+
+我們可以試著透過 union types 來解決這個問題。
+
 ```ts
 type Mapping = {
   [index: string]: string | number;
@@ -676,7 +759,38 @@ type Mapping = {
 }
 ```
 
+透過 union types 標註這個物件的屬性值型別是 `string | number`，  
+`name` 屬性的型別 `number` 就可以符合 `string | number` 的要求。
+
+<small>
+關於 union types 我們以後會在討論。
+</small>
+
+<small>
+稍微提醒一下，  
+實務上過度寬鬆的型別並不一定是好事，  
+如何拿捏型別的寬鬆程度是一門需要實務經驗的學問，  
+以後有機會我們會再深度探討。  
+</small>
+
+### Record Type
+
+因為把 object 當作 Hash Map 的情境實在太常見了，  
+TypeScript 提供了 built-in 的 utility type `Record<K, T>`  
+來幫助開發者簡化 Index Signature。
+
+```ts
+type Mapping = Record<string, string | number>;
+```
+
+<small>
+關於 utility type 我們以後會在討論。
+</small>
+
 ### Readonly Index Signature
+
+Index Signature 也可以標註為唯獨屬性，  
+被標註為唯獨之後，該物件的屬性值就不可被修改。
 
 ```ts
 type Mapping = {
@@ -689,7 +803,10 @@ const mapping: Mapping = {};
 // ^^^^^^^^^ Index signature in type 'Mapping' only permits reading.(2542)
 ```
 
-### Array
+### 陣列 Array
+
+並非真的陣列標註法，  
+不過我們確實可以透過 Index Signature 來標註陣列的型別。
 
 ```ts
 type Indexable = {
@@ -704,3 +821,42 @@ array[0]; // 'hello'
 
 array[1] = 'world';
 ```
+
+<small>
+這個作法會在進階的 TypeScript Type Language 中玩到，  
+以後有機會我們會再深度探討。
+</small>
+
+### Index Signature 與 Mapped Types
+
+因為它們的語法很像，所以在這邊稍微提一下。
+
+```ts
+type Arr = {
+  [index in 1 | 2 | 3]: string;
+}
+```
+
+為了強調差異，  
+Index Signature 使用 `:` 來分隔屬性名跟屬性型別，  
+而 Mapped Types 使用 `in` 來分隔屬性名跟屬性型別。
+
+```ts
+declare const arr: Arr;
+
+  arr[0];
+//^^^^^^ Element implicitly has an 'any' type because expression of type '0' can't be used to index type 'Arr'. Property '0' does not exist on type 'Arr'.(7053)
+  arr[1];
+  arr[2];
+  arr[3];
+  arr[4];
+//^^^^^^ Element implicitly has an 'any' type because expression of type '4' can't be used to index type 'Arr'. Property '4' does not exist on type 'Arr'.(7053)
+```
+
+上面可以看，  
+`arr[0]` 跟 `arr[4]` 都會拋出錯誤訊息 `7053`，  
+因為 `0` 跟 `4` 並不是 `1 | 2 | 3` 的子型別。
+
+<small>
+關於 Mapped Types 我們以後會在討論。
+</small>

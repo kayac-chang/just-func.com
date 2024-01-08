@@ -8,10 +8,6 @@ import rehypeKatex from "rehype-katex";
 const parseBlog = async (source: string) =>
   bundleMDX({
     source,
-    // files: {
-    //   "./app/components/ui/collapsible.tsx": collapsible,
-    //   "./app/components/Exam.tsx": exam,
-    // },
     mdxOptions(options) {
       options.remarkPlugins = [
         ...(options.remarkPlugins ?? []),

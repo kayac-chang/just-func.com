@@ -1,4 +1,9 @@
-import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import type {
+  MetaFunction,
+  LoaderFunctionArgs,
+  HeadersFunction,
+} from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { assert } from "@sindresorhus/is";
 import parseBlogServer from "~/services/parse-blog.server";
@@ -7,15 +12,23 @@ import Giscus from "@giscus/react";
 import { getMDXComponent } from "mdx-bundler/client/index.js";
 import { useMemo } from "react";
 import Exam from "~/components/Exam";
+import { identity, memoizeWith } from "ramda";
+
+// not done yet, need cdn or nginx
+export const headers: HeadersFunction = () => ({
+  "Cache-Control": "max-age=604800, stale-while-revalidate=86400",
+});
 
 export const meta: MetaFunction<typeof loader> = (args) =>
   args.data?.frontmatter.meta ?? [];
 
+const fn = memoizeWith(identity, (slug: string) =>
+  getBlogBySlugServer(slug).then((content) => parseBlogServer(content))
+);
+
 export async function loader(args: LoaderFunctionArgs) {
   assert.string(args.params.slug);
-  return getBlogBySlugServer(args.params.slug).then((content) =>
-    parseBlogServer(content)
-  );
+  return fn(args.params.slug).then(json);
 }
 
 export default function Route() {

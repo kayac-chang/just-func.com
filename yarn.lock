@@ -7840,6 +7840,18 @@ remark-mdx@^3.0.0:
     mdast-util-mdx "^3.0.0"
     micromark-extension-mdxjs "^3.0.0"
 
+remark-mermaidjs@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/remark-mermaidjs/-/remark-mermaidjs-6.0.0.tgz#89ded57981cc01b7a207860a2708fd410ba8c870"
+  integrity sha512-U7nJ8oJGhLPHfMvlmE+8bw57qp++hEygwSdANOHGmqg3V4uGUz8nnOwa1oWf6kwOrG7jf9gXllD+rWvf5mHzBw==
+  dependencies:
+    "@types/mdast" "^4.0.0"
+    hast-util-from-html-isomorphic "^2.0.0"
+    mermaid-isomorphic "^2.0.0"
+    unified "^11.0.0"
+    unist-util-visit-parents "^6.0.0"
+    vfile "^6.0.0"
+
 remark-parse-frontmatter@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/remark-parse-frontmatter/-/remark-parse-frontmatter-1.0.3.tgz#121f0b1b3bfc644fb7b58916ef803d794e083381"

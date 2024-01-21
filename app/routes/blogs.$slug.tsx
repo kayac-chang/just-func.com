@@ -13,6 +13,7 @@ import { getMDXComponent } from "mdx-bundler/client/index.js";
 import { useMemo } from "react";
 import Exam from "~/components/Exam";
 import { identity, memoizeWith } from "ramda";
+import { P, match } from "ts-pattern";
 
 // not done yet, need cdn or nginx
 export const headers: HeadersFunction = () => ({
@@ -22,9 +23,13 @@ export const headers: HeadersFunction = () => ({
 export const meta: MetaFunction<typeof loader> = (args) =>
   args.data?.frontmatter.meta ?? [];
 
-const fn = memoizeWith(identity, (slug: string) =>
-  getBlogBySlugServer(slug).then((content) => parseBlogServer(content))
-);
+const getBlogBySlug = (slug: string) =>
+  getBlogBySlugServer(slug).then((content) => parseBlogServer(content));
+
+const fn = match(process.env.NODE_ENV)
+  .with(P.union("development", "test"), () => getBlogBySlug)
+  .with("production", () => memoizeWith(identity, getBlogBySlug))
+  .exhaustive();
 
 export async function loader(args: LoaderFunctionArgs) {
   assert.string(args.params.slug);

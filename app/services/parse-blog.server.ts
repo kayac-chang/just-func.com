@@ -6,7 +6,6 @@ import remarkBreaks from "remark-breaks";
 import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeMermaid from "rehype-mermaid";
 import { fromHtmlIsomorphic } from "hast-util-from-html-isomorphic";
 
 const parseBlog = async (source: string) =>
@@ -33,7 +32,6 @@ const parseBlog = async (source: string) =>
           },
         ],
         rehypePrettyCode,
-        rehypeMermaid,
         rehypeKatex,
       ];
       return options;

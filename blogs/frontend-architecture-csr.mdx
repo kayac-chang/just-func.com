@@ -27,7 +27,11 @@ published: 2024-01-19
 
 在這邊不討論實際部署方式，有時間以後再討論。
 
-以下無論是 `useEffect` 或 `componentDidMount`，以下統稱為 __side effect__。
+無論是 [useEffect][use_effect] 或 [componentDidMount][component_did_mount]，以下統稱為 [side effect][side_effect]。
+
+[use_effect]: https://react.dev/reference/react/useEffect
+[component_did_mount]: https://react.dev/reference/react/Component#componentdidmount
+[side_effect]: https://en.wikipedia.org/wiki/Side_effect_(computer_science)#:~:text=In%20computer%20science%2C%20an%20operation,the%20invoker%20of%20the%20operation.
 
 注意在架構的世界沒有絕對的好壞，
 各種方案都有各自的優缺點，也有對應的優化方案，
@@ -40,8 +44,15 @@ published: 2024-01-19
   以下用詞會用 traditional server render 與 modern server render。
 
 為了提供對照組，這邊先介紹傳統的 server client 架構，
-包含 php、jsp、asp、blazor、rails、django 等等，
-都是在 server 端產生 html，再回傳給 client 端。
+包含 [php]、[jsp]、[asp]、[blazor]、[rails]、[django] 等等，
+都是在 Server 端產生 html，再回傳給 Client 端。
+
+[php]: https://www.php.net/
+[jsp]: https://docs.oracle.com/javaee/5/tutorial/doc/bnagy.html#bnagz
+[asp]: https://learn.microsoft.com/en-us/aspnet/core/getting-started/?view=aspnetcore-8.0&tabs=macos
+[blazor]: https://learn.microsoft.com/en-us/aspnet/core/blazor/?view=aspnetcore-8.0
+[rails]: https://guides.rubyonrails.org/layouts_and_rendering.html
+[django]: https://docs.djangoproject.com/en/5.0/ref/templates/language/
 
 ```mermaid
 sequenceDiagram
@@ -68,7 +79,9 @@ sequenceDiagram
 在 WEB 發展的前中期，這種架構是主流，
 這種架構的好處是幾乎所有的邏輯都是由 Server 端處理，
 Client 端只需要處理非常簡單的 UI 邏輯，
-即便後來發展了 ajax，也並沒有改變 Server 需要負責大部分邏輯的情況。
+即便後來發展了 [AJAX][ajax]，也並沒有改變 Server 需要負責大部分邏輯的情況。
+
+[ajax]: https://en.wikipedia.org/wiki/Ajax_(programming)
 
 這個架構在互動性上有很大的缺陷，
 因為大多數用戶操作都需要仰賴網路請求，
@@ -83,7 +96,7 @@ Client 端只需要處理非常簡單的 UI 邏輯，
 
 ## Single Page Application (SPA)
 
-Single Page Application 概念是，
+[Single Page Application][spa] 概念是，
 在一開始時就載入呈現面的相關資源，
 讓接下來有關畫面呈現的邏輯 (例如：換頁) 直接能在 Client 端自行完成 (透過 javascript)，
 而不需要一直向 server 端請求頁面。
@@ -91,11 +104,17 @@ Single Page Application 概念是，
 接下來要提到的 client side render、modern server side render 等等，
 都屬於 Single Page Application 的範疇。
 
+[spa]: https://en.wikipedia.org/wiki/Single-page_application
+
 ## client side render
 
 在純 client side render 的 react 應用程式，
 我們會將 react build 後產生的檔案放在一個靜態檔案伺服器上，
-靜態檔案伺服器可以是 nginx、apache、github pages 等等。
+靜態檔案伺服器可以是 [nginx]、[apache]、[github pages][gh_page] 等等。
+
+[nginx]: https://www.nginx.com/
+[apache]: https://www.apache.org/
+[gh_page]: https://pages.github.com/
 
 ```mermaid
 sequenceDiagram
@@ -140,7 +159,7 @@ sequenceDiagram
 注意到從 1 到 5 的過程中，用戶是看不到任何有意義畫面的，
 一直到第 6 步驟，才會看到第一次 render 的畫面。
 
-### 情境
+### 觀點
 
 由於畫面呈現面 (Presentation) 可以完全在 Client 端完成，
 它可以省下不必要的網路請求，與 Server 端的計算資源，
@@ -190,7 +209,7 @@ sequenceDiagram
 這種架構的好處是，可以將畫面呈現面的邏輯完全交給 Client 端，
 Server 端只需要負責資料的處理，並回傳純資料給 Client 端。
 
-以前異步請求被稱作 AJAX，
+以前異步請求被稱作 [AJAX][ajax]，
 如今幾乎沒有人特別提這個詞，
 因為在 client side render 架構下，異步請求是理所當然的事情。
 
@@ -203,8 +222,10 @@ Server 端只需要負責資料的處理，並回傳純資料給 Client 端。
 
 ## client side render 與 動態資料 (client loader)
 
-在 react router v6 之後，他們試圖導入了 client loader 的概念，
+在 react router v6 之後，他們試圖導入了 [client loader][loader] 的概念，
 這種架構是為了試圖解決上一個架構的問題而提出的，
+
+[loader]: https://reactrouter.com/en/main/route/loader
 
 ```mermaid
 sequenceDiagram
@@ -379,7 +400,7 @@ Server 端只需要負責資料的處理，並回傳純資料給 Client 端。
 而在純粹 client side render 的架構下，Server 端的方案就無法使用。
 
 所以前端隨著時間發展，也會開始思考 Server 端的方案，
-例如：modern server side render、ssg、csr、ssr、isr 等等，
+例如：modern server side render、ssg、ssr、isr 等等，
 這些方案都是為了解決 client side render 的缺點而提出的。
 
 因為前端也可能會有自己的 Server，

@@ -271,15 +271,15 @@ sequenceDiagram
   Browser->>Server: 1. GET /
   Server->>Browser: 2. index.html
   Browser->>Browser: 3. parse html
-  Browser->>Server: 4. GET style.js
-  Server->>Browser: 5. style.js
+  Browser->>Server: 4. GET style.css
+  Server->>Browser: 5. style.css
   Browser->>Browser: 6. apply style
 ```
 
 前三點相同，以下為新增的步驟：
 
 4. 發出相關資源請求，請求包括 index.html 中引用的 css、js、圖片等資源。
-   以 3 為例，Browser 會對 server 發出 GET style.js 的請求。
+   以 3 為例，Browser 會對 server 發出 GET style.css 的請求。
 
 5. Server 回傳 style.css 給 Browser。
 

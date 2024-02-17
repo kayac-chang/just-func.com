@@ -1,12 +1,23 @@
 
-https://web.dev/articles/inp
+因為 2024 年了，
+今年有個很重要的網頁指標需要注意叫 Interaction to Next Paint (INP)，
+因為看到蠻多網路文章雖然有提及，
+但看完全文只覺得是在講什麼鬼，
+所以在此特別整理一下。
 
-Why INP is important
+## 什麼是 Interaction to Next Paint (INP)
 
-Note: Interaction to Next Paint (INP) is a pending Core Web Vital metric that will replace First Input Delay (FID) in March 2024. INP assesses responsiveness using data from the Event Timing API. When an interaction causes a page to become unresponsive, that is a poor user experience. INP observes the latency of all interactions a user has made with the page, and reports a single value which all (or nearly all) interactions were below. A low INP means the page was consistently able to respond quickly to all—or the vast majority—of user interactions.
+INP 是一個評估網頁對使用者互動的整體反應能力的指標，
+透過觀測用戶在網頁上的點擊、點按和鍵盤互動之後，
+在畫面上產生視覺反饋的時間。
 
-Goal of INP
+最終的 INP 值是觀察到的最長互動時間，忽略離群值。
 
-The goal of INP is to ensure the time from when a user initiates an interaction until the next frame is painted is as short as possible, for all or most interactions the user makes.
+## 為什麼 INP 重要
 
-What is INP?
+在過去的網頁觀測指標中，大多數都是以網頁載入完成的時間為主，
+但是這樣的觀測指標並不能完全反應網頁的使用者體驗。
+
+在 Chrome 的使用資料中，顯示出使用者在網頁上花費 90% 的時間是在網頁載入之後，
+因此，仔細測量網頁生命週期中的響應能力是很重要的，
+這就是 INP 指標評估的內容。
